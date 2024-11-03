@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greeting Card Organizer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="loading" style="display: none;">Loading...</div>
+  <h1>Greeting Card Organizer</h1>
+
+  <!-- Form to Add a New Card -->
+  <div>
+    <h2>Add a New Card</h2>
+    <input id="title" placeholder="Title" />
+    <input id="from" placeholder="From" />
+    <input id="occasion" placeholder="Occasion" />
+    <input id="pages" type="file" multiple /> <!-- Allow multiple files to be selected -->
+    <button onclick="addCard()">Add Card</button>
+  </div>
+
+  <h2>Filter and Sort Cards</h2>
+  <select id="occasionFilter" onchange="getCards()">
+    <option value="">All Occasions</option>
+    <option value="Birthday">Birthday</option>
+    <option value="Holiday">Holiday</option>
+    <option value="Anniversary">Anniversary</option>
+  </select>
+
+  <select id="sortOrder" onchange="getCards()">
+    <option value="newest">Newest First</option>
+    <option value="oldest">Oldest First</option>
+  </select>
+
+  <h2>Search Cards</h2>
+  <input type="text" id="searchQuery" placeholder="Search cards..." />
+  <button onclick="getCards()">Apply Search</button>
+
+  <!-- Display All Cards -->
+  <div>
+    <h2>All Cards</h2>
+    <button onclick="getCards(true)">Refresh Cards</button>
+    <div id="cards"></div>
+  </div>
+
+  <!-- View Card Modal -->
+  <div id="viewModal" class="modal" onclick="closeModal('viewModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="close" onclick="closeModal('viewModal')">&times;</span>
+      <h2 id="viewTitle"></h2>
+      <p><strong>From:</strong> <span id="viewFrom"></span></p>
+      <p><strong>Occasion:</strong> <span id="viewOccasion"></span></p>
+      <div id="pageContainer" class="page-container">
+        <img id="pageImage" src="" alt="Card page" class="page-image" />
+      </div>
+      <div class="navigation">
+        <button class="arrow left-arrow" onclick="navigatePages(-1)">&#9664;</button>
+        <button class="arrow right-arrow" onclick="navigatePages(1)">&#9654;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Card Modal -->
+  <div id="editModal" class="modal" onclick="closeModal('editModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="close" onclick="closeModal('editModal')">&times;</span>
+      <h3>Edit Card</h3>
+      <input id="editTitle" placeholder="Title" />
+      <input id="editFrom" placeholder="From" />
+      <input id="editOccasion" placeholder="Occasion" />
+      <button onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+
+  <!-- Link to JavaScript file -->
+  <script src="app.js"></script>
+</body>
+</html>
