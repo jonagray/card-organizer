@@ -5,8 +5,9 @@ const cardSchema = new mongoose.Schema({
   title: { type: String, required: true },
   from: { type: String, required: true },
   occasion: { type: String, required: true },
-  pages: { type: [String], required: true }, // Array of image URLs or paths
-  upload_date: { type: Date, default: Date.now }
+  pages: { type: [String], required: true },
+  upload_date: { type: Date, default: Date.now },
+  flipOrientation: { type: String, default: "horizontal" } // 'horizontal' or 'vertical'
 });
 
 module.exports = mongoose.model("Card", cardSchema);
