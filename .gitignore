@@ -4,6 +4,9 @@ db
 temp
 build
 
+#Uploaded files
+/uploads
+
 # Created by https://www.gitignore.io/api/vim,osx,node,linux,windows
 ### Linux ###
 *~
