@@ -65,6 +65,7 @@ async function addCard() {
   const title = document.getElementById('title').value.trim();
   const from = document.getElementById('from').value.trim();
   const occasion = document.getElementById('occasion').value.trim();
+  const flipOrientation = document.getElementById('flipOrientation').value;
   const pagesInput = document.getElementById('pages');
 
   if (!title || !from || !occasion || pagesInput.files.length === 0) {
@@ -76,6 +77,7 @@ async function addCard() {
   formData.append("title", title);
   formData.append("from", from);
   formData.append("occasion", occasion);
+  formData.append("flipOrientation", flipOrientation); // Include orientation
 
   for (let i = 0; i < pagesInput.files.length; i++) {
     formData.append("pages", pagesInput.files[i]);
@@ -89,13 +91,12 @@ async function addCard() {
     const result = await response.json();
     alert('Card added successfully!');
     
-    // Clear the form fields after successful upload
     document.getElementById('title').value = '';
     document.getElementById('from').value = '';
     document.getElementById('occasion').value = '';
+    document.getElementById('flipOrientation').value = 'horizontal';
     pagesInput.value = '';
 
-    // Refresh the cards list
     getCards();
   } catch (error) {
     console.error('Error adding card:', error);
@@ -114,7 +115,10 @@ function viewCard(cardId) {
   document.getElementById('viewFrom').innerText = card.from;
   document.getElementById('viewOccasion').innerText = card.occasion;
 
-  displayPage(true); // Show the cover page without transition
+  // Store the flip orientation for the current card
+  const flipOrientation = card.flipOrientation || 'horizontal';
+  
+  displayPage(true, flipOrientation); // Show the cover page without transition initially
 
   const modal = document.getElementById('viewModal');
   modal.style.transition = 'opacity 0.5s ease-in-out';
@@ -122,30 +126,31 @@ function viewCard(cardId) {
   modal.style.display = 'flex'; // Ensure modal display is reset to visible
 }
 
-// Function to Display Current Page
-function displayPage(initialLoad = false) {
+function displayPage(initialLoad = false, flipOrientation = 'horizontal') {
   const pageImage = document.getElementById('pageImage');
-
+  
   // Style setup for consistent size and centering
   pageImage.style.width = '100%';
   pageImage.style.height = '80vh';
   pageImage.style.objectFit = 'contain';
   pageImage.style.objectPosition = 'center';
 
-  // Display the first page without transition on the initial load
   if (initialLoad) {
     pageImage.style.transition = 'none';
-    pageImage.style.transform = 'rotateY(0deg)';
+    pageImage.style.transform = 'rotate(0deg)';
     pageImage.src = cardPages[currentPageIndex];
   } else {
-    // Apply flip effect, then load the new image at the end of the flip
-    pageImage.style.transition = 'transform 0.8s ease';
-    pageImage.style.transform = 'rotateY(-180deg)';
+    // Determine the correct flip animation based on orientation
+    const flipAxis = flipOrientation === 'horizontal' ? 'Y' : 'X';
+    const angle = flipOrientation === 'horizontal' ? 'rotateY(-180deg)' : 'rotateX(-180deg)';
 
-    // Change image after transition ends
+    pageImage.style.transition = 'transform 0.8s ease';
+    pageImage.style.transform = angle;
+
+    // Change image after transition ends and reset transformation
     pageImage.addEventListener('transitionend', () => {
       pageImage.src = cardPages[currentPageIndex];
-      pageImage.style.transform = 'rotateY(0deg)';
+      pageImage.style.transform = `rotate${flipAxis}(0deg)`;
     }, { once: true });
   }
 
@@ -154,7 +159,7 @@ function displayPage(initialLoad = false) {
   document.querySelector('.right-arrow').style.display = currentPageIndex === cardPages.length - 1 ? 'none' : 'block';
 }
 
-// Function to Navigate Pages
+// Function to Navigate Pages with Flip Orientation
 function navigatePages(direction) {
   const previousIndex = currentPageIndex;
   currentPageIndex += direction;
@@ -166,30 +171,26 @@ function navigatePages(direction) {
   }
 
   if (currentPageIndex !== previousIndex) {
-    displayPage(); 
+    // Call displayPage with orientation when flipping pages
+    const currentCard = allCards.find(c => c.pages === cardPages);
+    displayPage(false, currentCard?.flipOrientation || 'horizontal'); 
   }
 }
 
 // Function to Open the Edit Modal
 function editCard(cardId) {
   const card = allCards.find(c => c._id === cardId);
-  if (!card) {
-    console.error('Card not found');
-    return alert('Card not found');
-  }
+  if (!card) return alert('Card not found');
 
-  console.log('Opening edit modal for card:', card); // Debug log to confirm function runs
-
-  // Populate the fields in the edit modal
   document.getElementById('editTitle').value = card.title;
   document.getElementById('editFrom').value = card.from;
   document.getElementById('editOccasion').value = card.occasion;
+  document.getElementById('editFlipOrientation').value = card.flipOrientation; // Set orientation
 
-  // Open the edit modal
   const editModal = document.getElementById('editModal');
   editModal.style.display = 'flex';
-  editModal.classList.add('show'); // Adding show class for CSS visibility
-  editModal.dataset.cardId = card._id; // Store the card ID for saving
+  editModal.classList.add('show');
+  editModal.dataset.cardId = card._id;
 }
 
 // Function to Save Edited Card
@@ -199,6 +200,7 @@ async function saveEdit() {
     title: document.getElementById('editTitle').value,
     from: document.getElementById('editFrom').value,
     occasion: document.getElementById('editOccasion').value,
+    flipOrientation: document.getElementById('editFlipOrientation').value // Update orientation
   };
 
   try {
@@ -207,9 +209,8 @@ async function saveEdit() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updatedCard)
     });
-    if (!response.ok) {
-      throw new Error('Failed to update card');
-    }
+    if (!response.ok) throw new Error('Failed to update card');
+    
     alert('Card updated successfully!');
     closeModal('editModal');
     getCards();
