@@ -170,16 +170,75 @@ function navigatePages(direction) {
   }
 }
 
+// Function to Open the Edit Modal
+function editCard(cardId) {
+  const card = allCards.find(c => c._id === cardId);
+  if (!card) {
+    console.error('Card not found');
+    return alert('Card not found');
+  }
+
+  console.log('Opening edit modal for card:', card); // Debug log to confirm function runs
+
+  // Populate the fields in the edit modal
+  document.getElementById('editTitle').value = card.title;
+  document.getElementById('editFrom').value = card.from;
+  document.getElementById('editOccasion').value = card.occasion;
+
+  // Open the edit modal
+  const editModal = document.getElementById('editModal');
+  editModal.style.display = 'flex';
+  editModal.classList.add('show'); // Adding show class for CSS visibility
+  editModal.dataset.cardId = card._id; // Store the card ID for saving
+}
+
+// Function to Save Edited Card
+async function saveEdit() {
+  const cardId = document.getElementById('editModal').dataset.cardId;
+  const updatedCard = {
+    title: document.getElementById('editTitle').value,
+    from: document.getElementById('editFrom').value,
+    occasion: document.getElementById('editOccasion').value,
+  };
+
+  try {
+    const response = await fetch(`/cards/${cardId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedCard)
+    });
+    if (!response.ok) {
+      throw new Error('Failed to update card');
+    }
+    alert('Card updated successfully!');
+    closeModal('editModal');
+    getCards();
+  } catch (error) {
+    console.error('Error updating card:', error);
+  }
+}
+
+// Function to Delete a Card
+async function deleteCard(cardId) {
+  try {
+    await fetch(`/cards/${cardId}`, { method: 'DELETE' });
+    alert('Card deleted successfully!');
+    getCards();
+  } catch (error) {
+    console.error('Error deleting card:', error);
+  }
+}
+
 // Function to Close Modals
 function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.classList.remove('show');
   
   setTimeout(() => {
-    modal.style.display = 'none'; // Hide completely after transition
+    modal.style.display = 'none';
   }, 500);
 
-  // Reset modal content for next use
+  // Reset transformations and transitions on image for next opening
   document.getElementById('pageImage').style.transform = 'rotateY(0deg)';
   document.getElementById('pageImage').style.transition = 'none';
 }

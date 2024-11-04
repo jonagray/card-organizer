@@ -43,8 +43,8 @@ button:hover {
 /* Cards Container */
 #cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Responsive columns */
-  gap: 20px; /* Space between cards */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
 }
 
 /* Card Styling */
@@ -68,14 +68,16 @@ button:hover {
   justify-content: center;
   align-items: center;
   opacity: 0;
+  z-index: 1000; /* Ensure modals appear above all other content */
   transition: opacity 0.3s ease;
 }
 
 .modal.show {
-  display: flex;
+  display: flex; /* Ensure it flexes into center */
   opacity: 1;
 }
 
+/* Modal Content Styling */
 .modal-content {
   background-color: #fff;
   padding: 20px;
@@ -84,6 +86,7 @@ button:hover {
   max-width: 800px;
   text-align: center;
   position: relative;
+  z-index: 1001;
 }
 
 .close {
@@ -103,14 +106,20 @@ button:hover {
   perspective: 1000px;
   margin-top: 20px;
   margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Page Image Styling */
 .page-image {
   width: 100%;
-  height: auto;
-  transition: transform 0.8s ease;
-  transform-origin: left;
+  height: 80vh;
+  object-fit: contain;
+  object-position: center;
+  transition: transform 0.8s ease, opacity 0.4s ease;
   backface-visibility: hidden;
+  transform-origin: center; /* Updated for better flipping behavior */
 }
 
 /* Navigation Arrows */
@@ -129,24 +138,7 @@ button:hover {
   opacity: 0.8;
 }
 
-/* Modal Image Styling */
-.page-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.page-image {
-  /* max-width: 90%;
-  max-height: 80vh;
-  object-fit: cover;
-  object-position: center; */
-  transition: transform 0.8s ease, opacity 0.4s ease;
-}
-
-.page-image {
-  width: 100%;
-  height: 80vh;
-  object-fit: contain;
-  object-position: center;
+/* Ensure navigation elements stay visible */
+.arrow:focus, .arrow:hover {
+  opacity: 1;
 }
