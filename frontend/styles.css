@@ -20,7 +20,7 @@ h1, h2 {
   max-width: 400px;
 }
 
-input, button {
+input, button, select {
   display: block;
   width: 100%;
   margin: 10px 0;
@@ -43,17 +43,77 @@ button:hover {
 /* Cards Container */
 #cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
+  justify-content: center; /* Centers the cards within the container */
+  max-width: 1000px; /* Optional max-width for controlling layout width */
+  margin: 0 auto; /* Centers the container itself on the page */
+}
+
+/* Limit to a maximum of 4 cards per row */
+@media (min-width: 800px) {
+  #cards {
+    grid-template-columns: repeat(7, 1fr); /* Maximum of 4 columns per row */
+  }
 }
 
 /* Card Styling */
 .card {
   background-color: #fff;
-  padding: 20px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
+  width: 200px;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+/* Image within Card */
+.card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Title Styling within Card */
+.card h3 {
+  font-size: 1em;
+  font-weight: bold;
+  margin: 10px 0 5px 0;
+  line-height: 1.2;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Text (from and occasion) within Card */
+.card p {
+  font-size: 0.9em;
+  margin: 5px 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Pages div styling */
+.pages {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card Buttons */
+.card-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: auto;
 }
 
 /* Modal Styles */
@@ -68,16 +128,15 @@ button:hover {
   justify-content: center;
   align-items: center;
   opacity: 0;
-  z-index: 1000; /* Ensure modals appear above all other content */
   transition: opacity 0.3s ease;
+  z-index: 1000;
 }
 
 .modal.show {
-  display: flex; /* Ensure it flexes into center */
+  display: flex;
   opacity: 1;
 }
 
-/* Modal Content Styling */
 .modal-content {
   background-color: #fff;
   padding: 20px;
@@ -86,7 +145,6 @@ button:hover {
   max-width: 800px;
   text-align: center;
   position: relative;
-  z-index: 1001;
 }
 
 .close {
@@ -106,20 +164,14 @@ button:hover {
   perspective: 1000px;
   margin-top: 20px;
   margin-bottom: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
-/* Page Image Styling */
 .page-image {
   width: 100%;
-  height: 80vh;
-  object-fit: contain;
-  object-position: center;
-  transition: transform 0.8s ease, opacity 0.4s ease;
+  height: auto;
+  transition: transform 0.8s ease;
+  transform-origin: left;
   backface-visibility: hidden;
-  transform-origin: center; /* Updated for better flipping behavior */
 }
 
 /* Navigation Arrows */
@@ -138,7 +190,6 @@ button:hover {
   opacity: 0.8;
 }
 
-/* Ensure navigation elements stay visible */
 .arrow:focus, .arrow:hover {
   opacity: 1;
 }

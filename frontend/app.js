@@ -47,9 +47,11 @@ async function getCards(resetFilters = false) {
         <div class="pages">
           <img src="${card.pages[0]}" alt="Card page" style="width: 100px; height: auto;"/> 
         </div>
+        <div class="card-buttons">
         <button onclick="viewCard('${card._id}')">View</button>
         <button onclick="editCard('${card._id}')">Edit</button>
         <button onclick="deleteCard('${card._id}')">Delete</button>
+        </div>
       `;
       cardsDiv.appendChild(cardElement);
     });
