@@ -67,6 +67,16 @@ app.get("/cards/:id", async (req, res) => {
   }
 });
 
+// Fetch unique occasions
+app.get("/occasions", async (req, res) => {
+  try {
+    const occasions = await Card.distinct("occasion");
+    res.json(occasions);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching occasions", error: err });
+  }
+});
+
 // API to upload card data
 app.post("/upload", upload.array("pages", 5), async (req, res) => {
   const { title, from, occasion } = req.body;
