@@ -107,11 +107,11 @@ function updateFromFilter() {
 
 // Function to Add a New Card
 async function addCard() {
-  const title = document.getElementById("title").value.trim();
-  const from = document.getElementById("from").value.trim();
-  const occasion = document.getElementById("occasion").value.trim();
-  const flipOrientation = document.getElementById("flipOrientation").value;
-  const pagesInput = document.getElementById("pages");
+  const title = document.getElementById('title').value.trim();
+  const from = document.getElementById('from').value.trim();
+  const occasion = document.getElementById('occasion').value.trim();
+  const flipOrientation = document.getElementById('flipOrientation').value; // Get the selected orientation
+  const pagesInput = document.getElementById('pages');
 
   if (!title || !from || !occasion || pagesInput.files.length === 0) {
     alert("Please fill in all fields and upload at least one image.");
@@ -122,33 +122,37 @@ async function addCard() {
   formData.append("title", title);
   formData.append("from", from);
   formData.append("occasion", occasion);
-  formData.append("flipOrientation", flipOrientation);
+  formData.append("flipOrientation", flipOrientation); // Ensure the flipOrientation is included
 
   for (let i = 0; i < pagesInput.files.length; i++) {
     formData.append("pages", pagesInput.files[i]);
   }
 
   try {
-    const response = await fetch("/upload", {
-      method: "POST",
-      body: formData,
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData
     });
     const result = await response.json();
-    alert("Card added successfully!");
 
-    document.getElementById("title").value = "";
-    document.getElementById("from").value = "";
-    document.getElementById("occasion").value = "";
-    document.getElementById("flipOrientation").value = "horizontal";
-    pagesInput.value = "";
+    if (result.success) {
+      alert('Card added successfully!');
+      
+      // Reset the form fields after successful upload
+      document.getElementById('title').value = '';
+      document.getElementById('from').value = '';
+      document.getElementById('occasion').value = '';
+      document.getElementById('flipOrientation').value = 'horizontal'; // Reset to default
+      pagesInput.value = '';
 
-    // Add the new occasion and From dynamically and refresh the cards
-    allOccasions.add(occasion);
-    allFroms.add(from);
-    updateFilters();
-    getCards();
+      // Refresh the cards list
+      getCards();
+    } else {
+      alert('Failed to add card. Please try again.');
+    }
   } catch (error) {
-    console.error("Error adding card:", error);
+    console.error('Error adding card:', error);
+    alert('An error occurred while adding the card.');
   }
 }
 

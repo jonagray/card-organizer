@@ -50,6 +50,53 @@ button:hover {
   margin: 0 auto; /* Centers the container itself on the page */
 }
 
+/* Page Container for Animation */
+.page-container {
+  width: 100%;
+  max-height: 70vh;
+  position: relative;
+  perspective: 1000px;
+  margin-top: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 20px; /* Add padding to create spacing between image and buttons */
+}
+
+/* Page Image Styling */
+.page-image {
+  max-width: 90%; /* Ensure the image doesn't extend beyond 90% of the container width */
+  max-height: 65vh; /* Ensure the image doesn't cover the buttons */
+  object-fit: contain; /* Maintain aspect ratio */
+  object-position: center; /* Center the image */
+  transition: transform 0.8s ease, opacity 0.4s ease;
+  backface-visibility: hidden;
+  transform-origin: center;
+}
+
+/* Navigation Arrows */
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 0 20px; /* Add spacing for better usability */
+}
+
+.arrow {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  opacity: 0.8;
+}
+
+.arrow:hover,
+.arrow:focus {
+  opacity: 1;
+}
+
 /* Limit to a maximum of 4 cards per row */
 @media (min-width: 800px) {
   #cards {
