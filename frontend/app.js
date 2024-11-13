@@ -2,6 +2,7 @@ let currentPage = 1;
 const cardsPerPage = 10;
 let allCards = [];
 let allOccasions = new Set(); // To track unique occasions
+let allFroms = new Set(); // To track unique "From" values
 let currentPageIndex = 0;
 let cardPages = [];
 
@@ -19,17 +20,20 @@ async function getCards(resetFilters = false) {
 
   if (resetFilters) {
     document.getElementById("occasionFilter").value = "";
+    document.getElementById("fromFilter").value = ""; // Reset From filter
     document.getElementById("sortOrder").value = "newest";
     document.getElementById("searchQuery").value = "";
     currentPage = 1;
   }
 
   const occasion = document.getElementById("occasionFilter").value;
+  const from = document.getElementById("fromFilter").value; // Get From filter value
   const sort = document.getElementById("sortOrder").value;
   const search = document.getElementById("searchQuery").value.trim();
 
   let url = `/cards?sort=${sort}&page=${currentPage}&limit=${cardsPerPage}`;
   if (occasion) url += `&occasion=${encodeURIComponent(occasion)}`;
+  if (from) url += `&from=${encodeURIComponent(from)}`; // Add From filter to query
   if (search) url += `&search=${encodeURIComponent(search)}`;
 
   try {
@@ -56,16 +60,23 @@ async function getCards(resetFilters = false) {
       `;
       cardsDiv.appendChild(cardElement);
 
-      // Add to the occasions set
+      // Add to the occasions and From sets
       allOccasions.add(card.occasion);
+      allFroms.add(card.from);
     });
 
-    updateOccasionFilter(); // Update the dropdown dynamically
+    updateFilters(); // Update the dropdowns dynamically
   } catch (error) {
     console.error("Error fetching cards:", error);
   } finally {
     document.getElementById("loading").style.display = "none";
   }
+}
+
+// Function to Update Both Filters (Occasion and From)
+function updateFilters() {
+  updateOccasionFilter();
+  updateFromFilter();
 }
 
 // Function to Update the Occasion Filter Dropdown
@@ -78,6 +89,19 @@ function updateOccasionFilter() {
     option.value = occasion;
     option.textContent = occasion;
     occasionFilter.appendChild(option);
+  });
+}
+
+// Function to Update the From Filter Dropdown
+function updateFromFilter() {
+  const fromFilter = document.getElementById("fromFilter");
+  fromFilter.innerHTML = `<option value="">All Senders</option>`; // Default option
+
+  allFroms.forEach((from) => {
+    const option = document.createElement("option");
+    option.value = from;
+    option.textContent = from;
+    fromFilter.appendChild(option);
   });
 }
 
@@ -118,9 +142,10 @@ async function addCard() {
     document.getElementById("flipOrientation").value = "horizontal";
     pagesInput.value = "";
 
-    // Add the new occasion dynamically and refresh the cards
+    // Add the new occasion and From dynamically and refresh the cards
     allOccasions.add(occasion);
-    updateOccasionFilter();
+    allFroms.add(from);
+    updateFilters();
     getCards();
   } catch (error) {
     console.error("Error adding card:", error);

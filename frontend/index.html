@@ -17,22 +17,25 @@
     <input id="from" placeholder="From" />
     <input id="occasion" placeholder="Occasion" />
     <input id="pages" type="file" multiple /> <!-- Allow multiple files to be selected -->
-    
+
     <!-- Orientation Selection -->
     <select id="flipOrientation">
       <option value="horizontal">Opens Left to Right (Book)</option>
       <option value="vertical">Opens Bottom to Top (Calendar)</option>
     </select>
-    
+
     <button onclick="addCard()">Add Card</button>
   </div>
 
   <h2>Filter and Sort Cards</h2>
+  <!-- Occasion Filter -->
   <select id="occasionFilter" onchange="getCards()">
     <option value="">All Occasions</option>
-    <option value="Birthday">Birthday</option>
-    <option value="Holiday">Holiday</option>
-    <option value="Anniversary">Anniversary</option>
+  </select>
+
+  <!-- From Filter -->
+  <select id="fromFilter" onchange="getCards()">
+    <option value="">All Senders</option>
   </select>
 
   <select id="sortOrder" onchange="getCards()">
@@ -69,23 +72,23 @@
   </div>
 
   <!-- Edit Card Modal -->
-<div id="editModal" class="modal" onclick="closeModal('editModal')">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <span class="close" onclick="closeModal('editModal')">&times;</span>
-    <h3>Edit Card</h3>
-    <input id="editTitle" placeholder="Title" />
-    <input id="editFrom" placeholder="From" />
-    <input id="editOccasion" placeholder="Occasion" />
-    
-    <!-- Orientation Selection for Edit -->
-    <select id="editFlipOrientation">
-      <option value="horizontal">Opens Left to Right (Book)</option>
-      <option value="vertical">Opens Bottom to Top (Calendar)</option>
-    </select>
-    
-    <button onclick="saveEdit()">Save Changes</button>
+  <div id="editModal" class="modal" onclick="closeModal('editModal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <span class="close" onclick="closeModal('editModal')">&times;</span>
+      <h3>Edit Card</h3>
+      <input id="editTitle" placeholder="Title" />
+      <input id="editFrom" placeholder="From" />
+      <input id="editOccasion" placeholder="Occasion" />
+
+      <!-- Orientation Selection for Edit -->
+      <select id="editFlipOrientation">
+        <option value="horizontal">Opens Left to Right (Book)</option>
+        <option value="vertical">Opens Bottom to Top (Calendar)</option>
+      </select>
+
+      <button onclick="saveEdit()">Save Changes</button>
+    </div>
   </div>
-</div>
 
   <!-- Link to JavaScript file -->
   <script src="app.js"></script>

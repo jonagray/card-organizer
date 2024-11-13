@@ -37,12 +37,23 @@ app.get("/", (req, res) => {
 
 // Fetch cards with filtering, sorting, search, and pagination
 app.get("/cards", async (req, res) => {
-  const { occasion, sort, search, page = 1, limit = 10 } = req.query;
+  const { occasion, from, sort, search, page = 1, limit = 10 } = req.query;
   const query = {};
 
-  // Apply occasion and search filters
+  // Apply occasion filter
   if (occasion) query.occasion = occasion;
-  if (search) query.$or = [{ title: { $regex: search, $options: "i" } }, { from: { $regex: search, $options: "i" } }, { occasion: { $regex: search, $options: "i" } }];
+
+  // Apply "From" filter
+  if (from) query.from = from;
+
+  // Apply search filter
+  if (search) {
+    query.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { from: { $regex: search, $options: "i" } },
+      { occasion: { $regex: search, $options: "i" } }
+    ];
+  }
 
   try {
     const cards = await Card.find(query)
@@ -76,6 +87,16 @@ app.get("/occasions", async (req, res) => {
     res.status(500).json({ message: "Error fetching occasions", error: err });
   }
 });
+
+// // Fetch unique senders
+// app.get("/senders", async (req, res) => {
+//   try {
+//     const senders = await Card.distinct("sender");
+//     res.json(senders);
+//   } catch (err) {
+//     res.status(500).json({ message: "Error fetching senders", error: err });
+//   }
+// });
 
 // API to upload card data
 app.post("/upload", upload.array("pages", 5), async (req, res) => {
