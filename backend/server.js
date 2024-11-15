@@ -90,15 +90,23 @@ app.get("/occasions", async (req, res) => {
 
 // API to upload card data
 app.post("/upload", upload.array("pages", 5), async (req, res) => {
-  const { title, from, occasion, flipOrientation } = req.body; // Destructure flipOrientation
+  const { title, from, occasion, flipOrientation, note } = req.body;
   const pages = req.files.map(file => `/uploads/${file.filename}`);
 
-  const card = new Card({ title, from, occasion, pages, flipOrientation }); // Include flipOrientation
+  const card = new Card({
+    title,
+    from,
+    occasion,
+    flipOrientation,
+    note: note || "", // Add note if provided, or default to an empty string
+    pages,
+  });
+
   try {
     await card.save();
     res.json({ success: true, card });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to save card", error });
+    res.status(500).json({ message: "Error saving card", error });
   }
 });
 

@@ -97,6 +97,63 @@ button:hover {
   opacity: 1;
 }
 
+#addNote,
+#editNote {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+#viewNoteButton {
+  margin-top: 10px;
+}
+
+#viewNoteText {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  text-align: left;
+} */
+
+#viewNoteButton {
+  margin-top: 10px;
+  padding: 5px 10px;
+  background-color: #3b5998;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+#viewNoteButton:hover {
+  background-color: #365492;
+}
+
+#viewNoteText {
+  background-color: #f9f9f9;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+#note, #editNote {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  font-size: 1em;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  resize: vertical;
+}
+
 /* Limit to a maximum of 4 cards per row */
 @media (min-width: 800px) {
   #cards {
