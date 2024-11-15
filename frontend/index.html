@@ -17,13 +17,17 @@
     <input id="from" placeholder="From" />
     <input id="occasion" placeholder="Occasion" />
     <input id="pages" type="file" multiple /> <!-- Allow multiple files to be selected -->
-
-    <!-- Orientation Selection -->
     <select id="flipOrientation">
       <option value="horizontal">Opens Left to Right (Book)</option>
       <option value="vertical">Opens Bottom to Top (Calendar)</option>
     </select>
-
+    <div>
+      <label>
+        <input type="checkbox" id="addNoteCheckbox" onchange="toggleNoteInput()"> Add a Note
+      </label>
+      <textarea id="note" style="display: none;" placeholder="Add your note here..."></textarea>
+    </div>
+    <textarea id="addNote" style="display: none;" placeholder="Add your note here..."></textarea>
     <button onclick="addCard()">Add Card</button>
   </div>
 
@@ -64,6 +68,10 @@
       <div id="pageContainer" class="page-container">
         <img id="pageImage" src="" alt="Card page" class="page-image" />
       </div>
+      <div>
+        <button id="viewNoteButton" style="display: none;" onclick="toggleNoteVisibility()">View Note</button>
+        <p id="viewNoteText" style="display: none;"></p>
+      </div>
       <div class="navigation">
         <button class="arrow left-arrow" onclick="navigatePages(-1)">&#9664;</button>
         <button class="arrow right-arrow" onclick="navigatePages(1)">&#9654;</button>
@@ -79,13 +87,11 @@
       <input id="editTitle" placeholder="Title" />
       <input id="editFrom" placeholder="From" />
       <input id="editOccasion" placeholder="Occasion" />
-
-      <!-- Orientation Selection for Edit -->
       <select id="editFlipOrientation">
         <option value="horizontal">Opens Left to Right (Book)</option>
         <option value="vertical">Opens Bottom to Top (Calendar)</option>
       </select>
-
+      <textarea id="editNote" placeholder="Edit your note here..."></textarea>
       <button onclick="saveEdit()">Save Changes</button>
     </div>
   </div>

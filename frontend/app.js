@@ -110,7 +110,8 @@ async function addCard() {
   const title = document.getElementById('title').value.trim();
   const from = document.getElementById('from').value.trim();
   const occasion = document.getElementById('occasion').value.trim();
-  const flipOrientation = document.getElementById('flipOrientation').value; // Get the selected orientation
+  const flipOrientation = document.getElementById('flipOrientation').value;
+  const noteInput = document.getElementById('note'); // Note input field
   const pagesInput = document.getElementById('pages');
 
   if (!title || !from || !occasion || pagesInput.files.length === 0) {
@@ -122,7 +123,8 @@ async function addCard() {
   formData.append("title", title);
   formData.append("from", from);
   formData.append("occasion", occasion);
-  formData.append("flipOrientation", flipOrientation); // Ensure the flipOrientation is included
+  formData.append("flipOrientation", flipOrientation);
+  formData.append("note", noteInput?.value.trim() || ""); // Add note if available
 
   for (let i = 0; i < pagesInput.files.length; i++) {
     formData.append("pages", pagesInput.files[i]);
@@ -131,50 +133,55 @@ async function addCard() {
   try {
     const response = await fetch('/upload', {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     const result = await response.json();
+    alert('Card added successfully!');
 
-    if (result.success) {
-      alert('Card added successfully!');
-      
-      // Reset the form fields after successful upload
-      document.getElementById('title').value = '';
-      document.getElementById('from').value = '';
-      document.getElementById('occasion').value = '';
-      document.getElementById('flipOrientation').value = 'horizontal'; // Reset to default
-      pagesInput.value = '';
+    document.getElementById('title').value = '';
+    document.getElementById('from').value = '';
+    document.getElementById('occasion').value = '';
+    document.getElementById('flipOrientation').value = 'horizontal';
+    noteInput.value = ''; // Reset note field
+    pagesInput.value = '';
 
-      // Refresh the cards list
-      getCards();
-    } else {
-      alert('Failed to add card. Please try again.');
-    }
+    getCards();
   } catch (error) {
     console.error('Error adding card:', error);
-    alert('An error occurred while adding the card.');
   }
 }
 
 // Function to Open View Modal
 function viewCard(cardId) {
-  const card = allCards.find((c) => c._id === cardId);
-  if (!card) return alert("Card not found");
+  const card = allCards.find(c => c._id === cardId);
+  if (!card) return alert('Card not found');
 
   cardPages = card.pages;
   currentPageIndex = 0;
 
-  document.getElementById("viewTitle").innerText = card.title;
-  document.getElementById("viewFrom").innerText = card.from;
-  document.getElementById("viewOccasion").innerText = card.occasion;
+  document.getElementById('viewTitle').innerText = card.title;
+  document.getElementById('viewFrom').innerText = card.from;
+  document.getElementById('viewOccasion').innerText = card.occasion;
 
-  const flipOrientation = card.flipOrientation || "horizontal";
+  const viewNoteButton = document.getElementById('viewNoteButton');
+  const viewNoteText = document.getElementById('viewNoteText');
+
+  if (card.note) {
+    viewNoteButton.style.display = 'block';
+    viewNoteText.innerText = card.note;
+    viewNoteText.style.display = 'none'; // Ensure the note is hidden initially
+  } else {
+    viewNoteButton.style.display = 'none';
+    viewNoteText.innerText = '';
+  }
+
+  const flipOrientation = card.flipOrientation || 'horizontal';
   displayPage(true, flipOrientation);
 
-  const modal = document.getElementById("viewModal");
-  modal.style.transition = "opacity 0.5s ease-in-out";
-  modal.classList.add("show");
-  modal.style.display = "flex";
+  const modal = document.getElementById('viewModal');
+  modal.style.transition = 'opacity 0.5s ease-in-out';
+  modal.classList.add('show');
+  modal.style.display = 'flex';
 }
 
 // Function to Display Current Page
@@ -231,45 +238,78 @@ function navigatePages(direction) {
 
 // Function to Open the Edit Modal
 function editCard(cardId) {
-  const card = allCards.find((c) => c._id === cardId);
-  if (!card) return alert("Card not found");
+  const card = allCards.find(c => c._id === cardId);
+  if (!card) return alert('Card not found');
 
-  document.getElementById("editTitle").value = card.title;
-  document.getElementById("editFrom").value = card.from;
-  document.getElementById("editOccasion").value = card.occasion;
-  document.getElementById("editFlipOrientation").value = card.flipOrientation;
+  document.getElementById('editTitle').value = card.title;
+  document.getElementById('editFrom').value = card.from;
+  document.getElementById('editOccasion').value = card.occasion;
+  document.getElementById('editFlipOrientation').value = card.flipOrientation;
+  document.getElementById('editNote').value = card.note || ''; // Populate the note field
 
-  const editModal = document.getElementById("editModal");
-  editModal.style.display = "flex";
-  editModal.classList.add("show");
+  const editModal = document.getElementById('editModal');
+  editModal.style.display = 'flex';
+  editModal.classList.add('show');
   editModal.dataset.cardId = card._id;
 }
 
 // Function to Save Edited Card
 async function saveEdit() {
-  const cardId = document.getElementById("editModal").dataset.cardId;
+  const cardId = document.getElementById('editModal').dataset.cardId;
   const updatedCard = {
-    title: document.getElementById("editTitle").value,
-    from: document.getElementById("editFrom").value,
-    occasion: document.getElementById("editOccasion").value,
-    flipOrientation: document.getElementById("editFlipOrientation").value,
+    title: document.getElementById('editTitle').value,
+    from: document.getElementById('editFrom').value,
+    occasion: document.getElementById('editOccasion').value,
+    flipOrientation: document.getElementById('editFlipOrientation').value,
+    note: document.getElementById('editNote').value.trim() // Update note
   };
 
   try {
     const response = await fetch(`/cards/${cardId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedCard),
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedCard)
     });
-    if (!response.ok) throw new Error("Failed to update card");
+    if (!response.ok) throw new Error('Failed to update card');
 
-    alert("Card updated successfully!");
-    closeModal("editModal");
+    alert('Card updated successfully!');
+    closeModal('editModal');
     getCards();
   } catch (error) {
-    console.error("Error updating card:", error);
+    console.error('Error updating card:', error);
   }
 }
+
+// Function to Toggle Note Input Field in Add Card Form
+function toggleNoteInput() {
+  const noteInput = document.getElementById('note');
+  const addNoteCheckbox = document.getElementById('addNoteCheckbox');
+  
+  if (addNoteCheckbox.checked) {
+    noteInput.style.display = 'block';
+  } else {
+    noteInput.style.display = 'none';
+    noteInput.value = ''; // Clear note input when hidden
+  }
+}
+
+// Function to Toggle Note Visibility in View Modal
+function toggleNoteVisibility() {
+  const noteText = document.getElementById('viewNoteText');
+  noteText.style.display = noteText.style.display === 'none' ? 'block' : 'none';
+}
+
+// // Toggle Note Field Visibility
+// function toggleNoteField(noteId) {
+//   const noteField = document.getElementById(noteId);
+//   noteField.style.display = noteField.style.display === 'none' ? 'block' : 'none';
+// }
+
+// // Toggle Note Visibility in View Modal
+// function toggleNoteVisibility() {
+//   const noteText = document.getElementById('viewNoteText');
+//   noteText.style.display = noteText.style.display === 'none' ? 'block' : 'none';
+// }
 
 // Function to Delete a Card
 async function deleteCard(cardId) {
