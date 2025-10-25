@@ -364,8 +364,18 @@ textarea {
 .card-buttons {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
   margin-top: auto;
+  padding: 0 5px;
+  flex-wrap: wrap;
+}
+
+.card-buttons button {
+  padding: 8px 12px;
+  font-size: 0.85em;
+  flex: 1;
+  min-width: 60px;
+  max-width: 80px;
 }
 
 /* Modal Styles */
@@ -479,18 +489,25 @@ textarea {
 /* Page Container for Animation */
 .page-container {
   width: 100%;
-  max-height: 70vh;
+  height: 60vh;
   position: relative;
   perspective: 1000px;
   margin-top: 20px;
   margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
 }
 
 .page-image {
-  width: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
   height: auto;
+  object-fit: contain;
   transition: transform 0.8s ease;
-  transform-origin: left;
+  transform-origin: center;
   backface-visibility: hidden;
 }
 
