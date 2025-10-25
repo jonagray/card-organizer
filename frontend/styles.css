@@ -1,53 +1,196 @@
 /* General Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 20px;
-  background-color: #f4f4f9;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
   color: #333;
 }
 
-h1, h2 {
-  color: #3b5998;
-}
-
-/* Form Styling */
-.form-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-  max-width: 400px;
-}
-
-input, button, select {
-  display: block;
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  font-size: 1em;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
-button {
-  background-color: #3b5998;
+h1 {
   color: #fff;
-  cursor: pointer;
+  font-size: 2.5em;
+  margin-bottom: 20px;
 }
 
-button:hover {
-  background-color: #365492;
+h2 {
+  color: #667eea;
+  font-size: 1.5em;
+  margin-bottom: 15px;
+}
+
+/* Navigation Bar */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.nav-brand {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.username-display {
+  margin-right: 15px;
+  font-weight: 600;
+  color: #667eea;
+}
+
+/* Button Styles */
+button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+  background-color: #fff;
+  color: #667eea;
+  border: 2px solid #667eea;
+}
+
+.btn-secondary:hover {
+  background-color: #667eea;
+  color: #fff;
+}
+
+.btn-large {
+  padding: 15px 40px;
+  font-size: 1.2em;
+  margin: 10px;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+/* Welcome Screen */
+.welcome-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 70px);
+  text-align: center;
+}
+
+.welcome-content {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 60px 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+}
+
+.welcome-content p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.welcome-buttons {
+  margin-top: 30px;
+}
+
+/* Input Styles */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 10px 0;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 1em;
+  transition: border-color 0.3s ease;
+  font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Main Content */
+#mainContent {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Filters Section */
+.filters-section {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 15px;
+  margin: 20px 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.filters-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* Cards Section */
+.cards-section {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 15px;
+  margin: 20px 0;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  min-height: 400px;
 }
 
 /* Cards Container */
 #cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  justify-content: center; /* Centers the cards within the container */
-  max-width: 1000px; /* Optional max-width for controlling layout width */
-  margin: 0 auto; /* Centers the container itself on the page */
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
 }
 
 /* Page Container for Animation */
@@ -164,16 +307,21 @@ button:hover {
 /* Card Styling */
 .card {
   background-color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
-  width: 200px;
-  height: 320px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
 }
 
 /* Image within Card */
@@ -228,36 +376,104 @@ button:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
   justify-content: center;
   align-items: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
   z-index: 1000;
+  animation: fadeIn 0.3s ease;
 }
 
 .modal.show {
   display: flex;
-  opacity: 1;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .modal-content {
   background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 70%;
-  max-width: 800px;
+  padding: 40px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 600px;
   text-align: center;
   position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .close {
   position: absolute;
-  top: 10px;
+  top: 15px;
   right: 20px;
-  font-size: 24px;
+  font-size: 30px;
   cursor: pointer;
-  color: #333;
+  color: #999;
+  transition: color 0.3s ease;
+}
+
+.close:hover {
+  color: #667eea;
+}
+
+/* Auth Modal Styles */
+.auth-modal {
+  max-width: 450px;
+}
+
+.auth-form {
+  margin-top: 25px;
+}
+
+.auth-switch {
+  margin-top: 20px;
+  color: #666;
+  font-size: 0.9em;
+}
+
+.auth-switch a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+/* Card Form Styles */
+.card-form {
+  margin-top: 20px;
+}
+
+.checkbox-container {
+  text-align: left;
+  margin: 15px 0;
+}
+
+.checkbox-container label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-container input[type="checkbox"] {
+  width: auto;
+  margin-right: 10px;
 }
 
 /* Page Container for Animation */

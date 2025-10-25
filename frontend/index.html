@@ -7,55 +7,115 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="loading" style="display: none;">Loading...</div>
-  <h1>Greeting Card Organizer</h1>
-
-  <!-- Form to Add a New Card -->
-  <div>
-    <h2>Add a New Card</h2>
-    <input id="title" placeholder="Title" />
-    <input id="from" placeholder="From" />
-    <input id="occasion" placeholder="Occasion" />
-    <input id="pages" type="file" multiple /> <!-- Allow multiple files to be selected -->
-    <select id="flipOrientation">
-      <option value="horizontal">Opens Left to Right (Book)</option>
-      <option value="vertical">Opens Bottom to Top (Calendar)</option>
-    </select>
-    <div>
-      <label>
-        <input type="checkbox" id="addNoteCheckbox" onchange="toggleNoteInput()"> Add a Note
-      </label>
-      <textarea id="note" style="display: none;" placeholder="Add your note here..."></textarea>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-brand">Greeting Card Organizer</div>
+    <div id="authButtons" class="nav-buttons">
+      <button class="btn-primary" onclick="openModal('loginModal')">Login</button>
+      <button class="btn-secondary" onclick="openModal('registerModal')">Register</button>
     </div>
-    <textarea id="addNote" style="display: none;" placeholder="Add your note here..."></textarea>
-    <button onclick="addCard()">Add Card</button>
+    <div id="userMenu" class="nav-buttons" style="display: none;">
+      <span id="username" class="username-display"></span>
+      <button class="btn-primary" onclick="openModal('addCardModal')">Add Card</button>
+      <button class="btn-secondary" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- Main Content (only shown when authenticated) -->
+  <div id="mainContent" style="display: none;">
+    <!-- Filter and Search Section -->
+    <div class="filters-section">
+      <h2>Filter and Search Cards</h2>
+      <div class="filters-container">
+        <select id="occasionFilter" onchange="getCards()">
+          <option value="">All Occasions</option>
+        </select>
+
+        <select id="fromFilter" onchange="getCards()">
+          <option value="">All Senders</option>
+        </select>
+
+        <select id="sortOrder" onchange="getCards()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+        </select>
+
+        <input type="text" id="searchQuery" placeholder="Search cards..." />
+        <button class="btn-primary" onclick="getCards()">Search</button>
+        <button class="btn-secondary" onclick="getCards(true)">Refresh</button>
+      </div>
+    </div>
+
+    <!-- Display All Cards -->
+    <div class="cards-section">
+      <div id="cards"></div>
+    </div>
   </div>
 
-  <h2>Filter and Sort Cards</h2>
-  <!-- Occasion Filter -->
-  <select id="occasionFilter" onchange="getCards()">
-    <option value="">All Occasions</option>
-  </select>
+  <!-- Welcome Screen (shown when not authenticated) -->
+  <div id="welcomeScreen" class="welcome-screen">
+    <div class="welcome-content">
+      <h1>Welcome to Greeting Card Organizer</h1>
+      <p>Organize, store, and cherish your greeting cards digitally</p>
+      <div class="welcome-buttons">
+        <button class="btn-large btn-primary" onclick="openModal('loginModal')">Login</button>
+        <button class="btn-large btn-secondary" onclick="openModal('registerModal')">Get Started</button>
+      </div>
+    </div>
+  </div>
 
-  <!-- From Filter -->
-  <select id="fromFilter" onchange="getCards()">
-    <option value="">All Senders</option>
-  </select>
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content auth-modal">
+      <span class="close" onclick="closeModal('loginModal')">&times;</span>
+      <h2>Login to Your Account</h2>
+      <div class="auth-form">
+        <input id="loginEmail" type="email" placeholder="Email" />
+        <input id="loginPassword" type="password" placeholder="Password" />
+        <button class="btn-primary btn-full" onclick="login()">Login</button>
+        <p class="auth-switch">Don't have an account? <a href="#" onclick="closeModal('loginModal'); openModal('registerModal'); return false;">Register here</a></p>
+      </div>
+    </div>
+  </div>
 
-  <select id="sortOrder" onchange="getCards()">
-    <option value="newest">Newest First</option>
-    <option value="oldest">Oldest First</option>
-  </select>
+  <!-- Register Modal -->
+  <div id="registerModal" class="modal">
+    <div class="modal-content auth-modal">
+      <span class="close" onclick="closeModal('registerModal')">&times;</span>
+      <h2>Create Your Account</h2>
+      <div class="auth-form">
+        <input id="registerUsername" type="text" placeholder="Username" />
+        <input id="registerEmail" type="email" placeholder="Email" />
+        <input id="registerPassword" type="password" placeholder="Password (min 6 characters)" />
+        <button class="btn-primary btn-full" onclick="register()">Register</button>
+        <p class="auth-switch">Already have an account? <a href="#" onclick="closeModal('registerModal'); openModal('loginModal'); return false;">Login here</a></p>
+      </div>
+    </div>
+  </div>
 
-  <h2>Search Cards</h2>
-  <input type="text" id="searchQuery" placeholder="Search cards..." />
-  <button onclick="getCards()">Apply Search</button>
-
-  <!-- Display All Cards -->
-  <div>
-    <h2>All Cards</h2>
-    <button onclick="getCards(true)">Refresh Cards</button>
-    <div id="cards"></div>
+  <!-- Add Card Modal -->
+  <div id="addCardModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('addCardModal')">&times;</span>
+      <h2>Add a New Card</h2>
+      <div class="card-form">
+        <input id="title" placeholder="Title" />
+        <input id="from" placeholder="From" />
+        <input id="occasion" placeholder="Occasion" />
+        <input id="pages" type="file" multiple accept="image/*" />
+        <select id="flipOrientation">
+          <option value="horizontal">Opens Left to Right (Book)</option>
+          <option value="vertical">Opens Bottom to Top (Calendar)</option>
+        </select>
+        <div class="checkbox-container">
+          <label>
+            <input type="checkbox" id="addNoteCheckbox" onchange="toggleNoteInput()"> Add a Note
+          </label>
+        </div>
+        <textarea id="note" style="display: none;" placeholder="Add your note here..."></textarea>
+        <button class="btn-primary btn-full" onclick="addCard()">Add Card</button>
+      </div>
+    </div>
   </div>
 
   <!-- View Card Modal -->

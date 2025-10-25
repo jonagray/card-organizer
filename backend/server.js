@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -5,9 +6,11 @@ const multer = require("multer");
 const cors = require("cors");
 const path = require("path"); // Add this line to handle paths
 const Card = require("./models/Card");
+const authRoutes = require("./routes/auth");
+const authMiddleware = require("./middleware/auth");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(bodyParser.json());
@@ -16,8 +19,9 @@ app.use(express.static(path.join(__dirname, "../frontend"))); // Adjusted path
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connect to MongoDB
-mongoose.connect("mongodb://127.0.0.1:27017/cardOrganizerDB")
-  .then(() => console.log("Connected to MongoDB locally"))
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/cardOrganizerDB";
+mongoose.connect(MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log("Error connecting to MongoDB:", err));
 
 // Card image upload setup
@@ -31,14 +35,17 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// Auth routes
+app.use("/auth", authRoutes);
+
 app.get("/", (req, res) => {
   res.send("Welcome to the Greeting Card Organizer API");
 });
 
-// Fetch cards with filtering, sorting, search, and pagination
-app.get("/cards", async (req, res) => {
+// Fetch cards with filtering, sorting, search, and pagination (protected)
+app.get("/cards", authMiddleware, async (req, res) => {
   const { occasion, from, sort, search, page = 1, limit = 10 } = req.query;
-  const query = {};
+  const query = { userId: req.userId }; // Only show cards for the authenticated user
 
   // Apply occasion filter
   if (occasion) query.occasion = occasion;
@@ -67,10 +74,10 @@ app.get("/cards", async (req, res) => {
   }
 });
 
-// Fetch a single card by ID
-app.get("/cards/:id", async (req, res) => {
+// Fetch a single card by ID (protected)
+app.get("/cards/:id", authMiddleware, async (req, res) => {
   try {
-    const card = await Card.findById(req.params.id);
+    const card = await Card.findOne({ _id: req.params.id, userId: req.userId });
     if (!card) return res.status(404).json({ message: "Card not found" });
     res.json(card);
   } catch (err) {
@@ -78,18 +85,18 @@ app.get("/cards/:id", async (req, res) => {
   }
 });
 
-// Fetch unique occasions
-app.get("/occasions", async (req, res) => {
+// Fetch unique occasions (protected)
+app.get("/occasions", authMiddleware, async (req, res) => {
   try {
-    const occasions = await Card.distinct("occasion");
+    const occasions = await Card.distinct("occasion", { userId: req.userId });
     res.json(occasions);
   } catch (err) {
     res.status(500).json({ message: "Error fetching occasions", error: err });
   }
 });
 
-// API to upload card data
-app.post("/upload", upload.array("pages", 5), async (req, res) => {
+// API to upload card data (protected)
+app.post("/upload", authMiddleware, upload.array("pages", 5), async (req, res) => {
   const { title, from, occasion, flipOrientation, note } = req.body;
   const pages = req.files.map(file => `/uploads/${file.filename}`);
 
@@ -100,6 +107,7 @@ app.post("/upload", upload.array("pages", 5), async (req, res) => {
     flipOrientation,
     note: note || "", // Add note if provided, or default to an empty string
     pages,
+    userId: req.userId // Associate card with authenticated user
   });
 
   try {
@@ -110,10 +118,17 @@ app.post("/upload", upload.array("pages", 5), async (req, res) => {
   }
 });
 
-// Update a card by ID
-app.put("/cards/:id", async (req, res) => {
+// Update a card by ID (protected)
+app.put("/cards/:id", authMiddleware, async (req, res) => {
   try {
-    const updatedCard = await Card.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    // Don't allow updating userId
+    delete req.body.userId;
+
+    const updatedCard = await Card.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
+      req.body,
+      { new: true }
+    );
     if (!updatedCard) return res.status(404).json({ message: "Card not found" });
     res.json(updatedCard);
   } catch (err) {
@@ -121,10 +136,10 @@ app.put("/cards/:id", async (req, res) => {
   }
 });
 
-// Delete a card by ID
-app.delete("/cards/:id", async (req, res) => {
+// Delete a card by ID (protected)
+app.delete("/cards/:id", authMiddleware, async (req, res) => {
   try {
-    const deletedCard = await Card.findByIdAndDelete(req.params.id);
+    const deletedCard = await Card.findOneAndDelete({ _id: req.params.id, userId: req.userId });
     if (!deletedCard) return res.status(404).json({ message: "Card not found" });
     res.json({ message: "Card deleted successfully" });
   } catch (err) {
