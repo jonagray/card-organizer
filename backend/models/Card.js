@@ -8,7 +8,8 @@ const cardSchema = new mongoose.Schema({
   pages: { type: [String], required: true }, // Array of image URLs or paths
   flipOrientation: { type: String, default: "horizontal" }, // Orientation of the card
   note: { type: String, default: "" }, // Optional note
-  upload_date: { type: Date, default: Date.now }
+  upload_date: { type: Date, default: Date.now },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } // Reference to the user who owns this card
 });
 
 module.exports = mongoose.model("Card", cardSchema);
