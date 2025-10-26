@@ -12,7 +12,7 @@ let currentPageIndex = 0;
 let cardPages = [];
 
 // API Base URL
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://card-organizer-2c5o.onrender.com';
 
 // Initialize app on page load
 document.addEventListener("DOMContentLoaded", () => {
