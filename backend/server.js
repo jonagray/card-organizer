@@ -5,12 +5,20 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const cors = require("cors");
 const path = require("path"); // Add this line to handle paths
+const fs = require("fs"); // Add fs to create directories
 const Card = require("./models/Card");
 const authRoutes = require("./routes/auth");
 const authMiddleware = require("./middleware/auth");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log("Created uploads directory");
+}
 
 // Middleware
 app.use(bodyParser.json());
