@@ -25,7 +25,18 @@ const s3Client = new S3Client({
 
 // Middleware
 app.use(bodyParser.json());
-app.use(cors());
+
+// CORS configuration - allow Netlify frontend
+const corsOptions = {
+  origin: [
+    'https://mycardorganizer.netlify.app',
+    'http://localhost:3000', // For local development
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+
 app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Connect to MongoDB
