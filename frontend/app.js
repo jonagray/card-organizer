@@ -14,6 +14,16 @@ let cardPages = [];
 // API Base URL
 const API_URL = 'https://card-organizer-2c5o.onrender.com';
 
+// Helper function to get full image URL (handles both S3 and local URLs)
+function getImageUrl(imagePath) {
+  // If already a full URL (S3), return as-is
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  // Otherwise prepend API_URL for local storage
+  return `${API_URL}${imagePath}`;
+}
+
 // Initialize app on page load
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
@@ -223,7 +233,7 @@ async function getCards(resetFilters = false) {
         <p><strong>From:</strong> ${card.from}</p>
         <p><strong>Occasion:</strong> ${card.occasion}</p>
         <div class="pages">
-          <img src="${API_URL}${card.pages[0]}" alt="Card page" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;"/>
+          <img src="${getImageUrl(card.pages[0])}" alt="Card page" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;"/>
         </div>
         <div class="card-buttons">
           <button class="btn-primary" onclick="viewCard('${card._id}')">View</button>
@@ -379,7 +389,7 @@ function displayPage(initialLoad = false, flipOrientation = "horizontal") {
   if (initialLoad) {
     pageImage.style.transition = "none";
     pageImage.style.transform = "rotate(0deg)";
-    pageImage.src = `${API_URL}${cardPages[currentPageIndex]}`;
+    pageImage.src = getImageUrl(cardPages[currentPageIndex]);
   } else {
     const flipAxis = flipOrientation === "horizontal" ? "Y" : "X";
     const angle = flipOrientation === "horizontal" ? "rotateY(-180deg)" : "rotateX(-180deg)";
@@ -390,7 +400,7 @@ function displayPage(initialLoad = false, flipOrientation = "horizontal") {
     pageImage.addEventListener(
       "transitionend",
       () => {
-        pageImage.src = `${API_URL}${cardPages[currentPageIndex]}`;
+        pageImage.src = getImageUrl(cardPages[currentPageIndex]);
         pageImage.style.transform = `rotate${flipAxis}(0deg)`;
       },
       { once: true }
