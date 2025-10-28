@@ -506,7 +506,7 @@ textarea {
   width: auto;
   height: auto;
   object-fit: contain;
-  transition: transform 0.8s ease;
+  transition: transform 0.4s ease;
   transform-origin: center;
   backface-visibility: hidden;
 }
@@ -529,4 +529,280 @@ textarea {
 
 .arrow:focus, .arrow:hover {
   opacity: 1;
+}
+/* ========================================
+   MOBILE RESPONSIVE STYLES
+   ======================================== */
+
+/* Tablet and below (768px) */
+@media (max-width: 768px) {
+  /* Navigation adjustments */
+  .navbar {
+    padding: 12px 15px;
+    flex-wrap: wrap;
+  }
+
+  .nav-brand {
+    font-size: 1.2em;
+  }
+
+  .nav-buttons {
+    gap: 8px;
+  }
+
+  .nav-buttons button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+  }
+
+  .username-display {
+    font-size: 0.9em;
+    margin-right: 10px;
+  }
+
+  /* Welcome screen */
+  .welcome-content {
+    padding: 40px 25px;
+    margin: 20px;
+  }
+
+  .welcome-content h1 {
+    font-size: 2em;
+  }
+
+  .welcome-content p {
+    font-size: 1em;
+  }
+
+  /* Filters section */
+  .filters-section {
+    padding: 20px 15px;
+  }
+
+  .filters-container {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .filters-container input,
+  .filters-container select,
+  .filters-container button {
+    font-size: 0.9em;
+  }
+
+  /* Cards section */
+  .cards-section {
+    padding: 20px 15px;
+  }
+
+  #cards {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+
+  /* Card styling */
+  .card {
+    padding: 12px;
+  }
+
+  .card h3 {
+    font-size: 0.95em;
+  }
+
+  .card p {
+    font-size: 0.85em;
+  }
+
+  .card-buttons button {
+    padding: 6px 10px;
+    font-size: 0.8em;
+    min-width: 50px;
+  }
+
+  /* Modal adjustments */
+  .modal-content {
+    width: 95%;
+    padding: 30px 20px;
+  }
+
+  .auth-modal {
+    max-width: 400px;
+  }
+
+  /* Form inputs - better touch targets */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="file"],
+  select,
+  textarea {
+    padding: 14px 15px;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    min-height: 44px; /* Apple HIG minimum touch target */
+  }
+
+  /* Buttons - better touch targets */
+  button {
+    min-height: 44px;
+    padding: 12px 20px;
+  }
+
+  .btn-large {
+    padding: 16px 35px;
+    font-size: 1.1em;
+  }
+}
+
+/* Mobile phones (480px and below) */
+@media (max-width: 480px) {
+  /* Navigation - stack on very small screens */
+  .navbar {
+    padding: 10px;
+  }
+
+  .nav-brand {
+    font-size: 1em;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .nav-buttons {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-buttons button {
+    padding: 8px 12px;
+    font-size: 0.85em;
+    flex: 1;
+    max-width: 120px;
+  }
+
+  .username-display {
+    width: 100%;
+    text-align: center;
+    margin: 5px 0;
+  }
+
+  /* Welcome screen */
+  .welcome-content h1 {
+    font-size: 1.5em;
+  }
+
+  .btn-large {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  /* Filters - full width stacking */
+  .filters-container {
+    grid-template-columns: 1fr;
+  }
+
+  /* Cards - single column on very small screens */
+  #cards {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .card {
+    max-width: 100%;
+  }
+
+  /* Modal adjustments */
+  .modal-content {
+    width: 98%;
+    padding: 25px 15px;
+    border-radius: 15px;
+  }
+
+  .close {
+    font-size: 24px;
+    top: 10px;
+    right: 15px;
+  }
+
+  /* Page container for viewing cards */
+  .page-container {
+    height: 50vh;
+  }
+
+  /* Navigation arrows */
+  .arrow {
+    font-size: 20px;
+  }
+
+  /* Form adjustments */
+  h2 {
+    font-size: 1.2em;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  select,
+  textarea {
+    font-size: 16px;
+    padding: 15px;
+  }
+
+  .checkbox-container label {
+    font-size: 0.95em;
+  }
+}
+
+/* Landscape mobile phones */
+@media (max-width: 768px) and (orientation: landscape) {
+  .page-container {
+    height: 70vh;
+  }
+
+  .welcome-screen {
+    min-height: auto;
+    padding: 20px 0;
+  }
+}
+
+/* Improve form field styling for all screens */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: #fff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea {
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+textarea:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Improve button tap feedback on mobile */
+button:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0) scale(0.98);
 }
