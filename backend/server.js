@@ -3,9 +3,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const multer = require("multer");
+const multerS3 = require("multer-s3");
+const { S3Client } = require("@aws-sdk/client-s3");
 const cors = require("cors");
-const path = require("path"); // Add this line to handle paths
-const fs = require("fs"); // Add fs to create directories
+const path = require("path");
 const Card = require("./models/Card");
 const authRoutes = require("./routes/auth");
 const authMiddleware = require("./middleware/auth");
@@ -13,18 +14,19 @@ const authMiddleware = require("./middleware/auth");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, "uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-  console.log("Created uploads directory");
-}
+// Configure AWS S3 Client
+const s3Client = new S3Client({
+  region: process.env.AWS_REGION || 'us-east-2',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+  }
+});
 
 // Middleware
 app.use(bodyParser.json());
 app.use(cors());
-app.use(express.static(path.join(__dirname, "../frontend"))); // Adjusted path
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(express.static(path.join(__dirname, "../frontend")));
 
 // Connect to MongoDB
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/cardOrganizerDB";
@@ -32,16 +34,24 @@ mongoose.connect(MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.log("Error connecting to MongoDB:", err));
 
-// Card image upload setup
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "uploads"));
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+// Card image upload setup with S3
+const upload = multer({
+  storage: multerS3({
+    s3: s3Client,
+    bucket: process.env.AWS_S3_BUCKET || 'card-organizer-images-jonnyg',
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    metadata: function (req, file, cb) {
+      cb(null, { fieldName: file.fieldname });
+    },
+    key: function (req, file, cb) {
+      const uniqueFileName = Date.now() + "-" + file.originalname;
+      cb(null, `cards/${uniqueFileName}`);
+    }
+  }),
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
   }
 });
-const upload = multer({ storage });
 
 // Auth routes
 app.use("/auth", authRoutes);
@@ -106,7 +116,8 @@ app.get("/occasions", authMiddleware, async (req, res) => {
 // API to upload card data (protected)
 app.post("/upload", authMiddleware, upload.array("pages", 5), async (req, res) => {
   const { title, from, occasion, flipOrientation, note } = req.body;
-  const pages = req.files.map(file => `/uploads/${file.filename}`);
+  // S3 files have 'location' property with full URL
+  const pages = req.files.map(file => file.location);
 
   const card = new Card({
     title,
