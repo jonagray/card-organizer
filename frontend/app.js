@@ -394,7 +394,7 @@ function displayPage(initialLoad = false, flipOrientation = "horizontal") {
     const flipAxis = flipOrientation === "horizontal" ? "Y" : "X";
     const angle = flipOrientation === "horizontal" ? "rotateY(-180deg)" : "rotateX(-180deg)";
 
-    pageImage.style.transition = "transform 0.8s ease";
+    pageImage.style.transition = "transform 0.4s ease";
     pageImage.style.transform = angle;
 
     pageImage.addEventListener(
