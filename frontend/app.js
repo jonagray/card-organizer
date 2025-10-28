@@ -11,8 +11,8 @@ let allFroms = new Set();
 let currentPageIndex = 0;
 let cardPages = [];
 
-// API Base URL
-const API_URL = 'https://card-organizer-2c5o.onrender.com';
+// API Base URL - loaded from config.js
+const API_URL = API_CONFIG.API_URL;
 
 // Helper function to get full image URL (handles both S3 and local URLs)
 function getImageUrl(imagePath) {
