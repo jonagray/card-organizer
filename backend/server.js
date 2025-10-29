@@ -67,6 +67,11 @@ const upload = multer({
 // Auth routes
 app.use("/auth", authRoutes);
 
+// Health check endpoint for Railway
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok", port: PORT });
+});
+
 app.get("/", (req, res) => {
   res.send("Welcome to the Greeting Card Organizer API");
 });
@@ -178,6 +183,8 @@ app.delete("/cards/:id", authMiddleware, async (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Server bound to 0.0.0.0:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 });
