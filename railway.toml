@@ -1,7 +1,3 @@
-[build]
-builder = "NIXPACKS"
-buildCommand = "echo 'Dependencies installed via postinstall hook'"
-
 [deploy]
 startCommand = "npm start"
 restartPolicyType = "ON_FAILURE"
