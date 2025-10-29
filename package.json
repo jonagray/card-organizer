@@ -4,8 +4,8 @@
   "description": "Card Organizer - Netlify Frontend + Railway Backend",
   "private": true,
   "scripts": {
-    "start": "cd backend && npm start",
-    "install-backend": "cd backend && npm install"
+    "postinstall": "cd backend && npm install",
+    "start": "cd backend && npm start"
   },
   "engines": {
     "node": ">=18.0.0"
