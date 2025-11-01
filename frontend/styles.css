@@ -46,13 +46,17 @@ h2 {
   font-size: 1.5em;
   font-weight: bold;
   color: #667eea;
+  flex-shrink: 0;
+  text-align: left;
 }
 
 .nav-buttons {
   display: flex;
   gap: 10px;
   align-items: center;
+  justify-content: flex-end;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .username-display {
@@ -104,8 +108,10 @@ h2 {
   padding: 15px 30px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   justify-content: center;
+  align-items: center;
   gap: 15px;
-  transition: max-height 0.3s ease;
+  width: 100%;
+  z-index: 998;
 }
 
 .mobile-menu.active {
