@@ -39,6 +39,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: nowrap;
 }
 
 .nav-brand {
@@ -51,6 +52,7 @@ h2 {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .username-display {
@@ -72,6 +74,7 @@ h2 {
   display: flex;
   gap: 10px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 /* Hamburger Menu (Always shown when logged out) */
@@ -115,8 +118,13 @@ h2 {
 
 /* Mobile Styles */
 @media (max-width: 768px) {
+  .navbar {
+    padding: 12px 15px;
+  }
+
   .nav-brand {
     font-size: 1.2em;
+    flex-shrink: 0;
   }
 
   .mobile-menu {
@@ -129,19 +137,32 @@ h2 {
   }
 
   .user-menu {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
     width: 100%;
+    flex-wrap: nowrap;
   }
 
   .username-display {
     margin-right: 0;
+    font-size: 0.95em;
+    flex-shrink: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .user-buttons {
-    width: 100%;
+    display: flex;
+    gap: 8px;
     justify-content: flex-end;
+    flex-shrink: 0;
+  }
+
+  .user-buttons button {
+    padding: 8px 12px;
+    font-size: 0.85em;
   }
 }
 
