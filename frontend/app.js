@@ -62,6 +62,8 @@ function showAuthenticatedView() {
   document.getElementById('welcomeScreen').style.display = 'none';
   document.getElementById('mainContent').style.display = 'block';
   document.getElementById('authButtons').style.display = 'none';
+  document.getElementById('mobileMenu').style.display = 'none';
+  document.getElementById('mobileMenu').classList.remove('active');
   document.getElementById('userMenu').style.display = 'flex';
   document.getElementById('username').textContent = `Hello, ${currentUser.username}!`;
   // Hide the brand name when authenticated

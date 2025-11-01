@@ -9,28 +9,32 @@
 <body>
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <div class="nav-brand" id="navBrand">Greeting Card Organizer</div>
+    <div class="nav-brand" id="navBrand">Home</div>
 
-    <!-- Hamburger Menu (Unauthenticated) -->
+    <!-- Hamburger Menu Button (Unauthenticated) -->
     <div id="authButtons" class="nav-buttons">
       <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
         <span></span>
         <span></span>
         <span></span>
       </button>
-      <div id="mobileMenu" class="mobile-menu">
-        <button class="btn-primary" onclick="openModal('loginModal'); closeMobileMenu()">Login</button>
-        <button class="btn-secondary" onclick="openModal('registerModal'); closeMobileMenu()">Register</button>
-      </div>
     </div>
 
     <!-- User Menu (Authenticated) -->
-    <div id="userMenu" class="nav-buttons" style="display: none;">
+    <div id="userMenu" class="user-menu" style="display: none;">
       <span id="username" class="username-display"></span>
-      <button class="btn-secondary" onclick="openModal('addCardModal')">Add Card</button>
-      <button class="btn-secondary" onclick="logout()">Logout</button>
+      <div class="user-buttons">
+        <button class="btn-primary" onclick="openModal('addCardModal')">Add Card</button>
+        <button class="btn-secondary" onclick="logout()">Logout</button>
+      </div>
     </div>
   </nav>
+
+  <!-- Mobile Menu Dropdown (Unauthenticated) -->
+  <div id="mobileMenu" class="mobile-menu">
+    <button class="btn-primary" onclick="openModal('loginModal'); closeMobileMenu()">Login</button>
+    <button class="btn-secondary" onclick="openModal('registerModal'); closeMobileMenu()">Register</button>
+  </div>
 
   <!-- Main Content (only shown when authenticated) -->
   <div id="mainContent" style="display: none;">
