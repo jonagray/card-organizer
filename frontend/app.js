@@ -64,6 +64,8 @@ function showAuthenticatedView() {
   document.getElementById('authButtons').style.display = 'none';
   document.getElementById('userMenu').style.display = 'flex';
   document.getElementById('username').textContent = `Hello, ${currentUser.username}!`;
+  // Hide the brand name when authenticated
+  document.getElementById('navBrand').style.display = 'none';
 }
 
 // Show unauthenticated view
@@ -72,6 +74,8 @@ function showUnauthenticatedView() {
   document.getElementById('mainContent').style.display = 'none';
   document.getElementById('authButtons').style.display = 'flex';
   document.getElementById('userMenu').style.display = 'none';
+  // Show the brand name when unauthenticated
+  document.getElementById('navBrand').style.display = 'block';
 }
 
 // Register function
@@ -563,5 +567,31 @@ window.onclick = function(event) {
         closeModal(modalId);
       }
     });
+  }
+}
+
+// Toggle mobile hamburger menu
+function toggleMobileMenu() {
+  const mobileMenu = document.getElementById('mobileMenu');
+  mobileMenu.classList.toggle('active');
+}
+
+// Close mobile menu
+function closeMobileMenu() {
+  const mobileMenu = document.getElementById('mobileMenu');
+  mobileMenu.classList.remove('active');
+}
+
+// Toggle filters dropdown
+function toggleFilters() {
+  const filtersContainer = document.getElementById('filtersContainer');
+  const toggleIcon = document.getElementById('filterToggleIcon');
+  
+  if (filtersContainer.style.display === 'none' || filtersContainer.style.display === '') {
+    filtersContainer.style.display = 'grid';
+    toggleIcon.classList.add('rotated');
+  } else {
+    filtersContainer.style.display = 'none';
+    toggleIcon.classList.remove('rotated');
   }
 }

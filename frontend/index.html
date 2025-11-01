@@ -9,24 +9,38 @@
 <body>
   <!-- Navigation Bar -->
   <nav class="navbar">
-    <div class="nav-brand">Greeting Card Organizer</div>
+    <div class="nav-brand" id="navBrand">Greeting Card Organizer</div>
+
+    <!-- Hamburger Menu (Unauthenticated) -->
     <div id="authButtons" class="nav-buttons">
-      <button class="btn-primary" onclick="openModal('loginModal')">Login</button>
-      <button class="btn-secondary" onclick="openModal('registerModal')">Register</button>
+      <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div id="mobileMenu" class="mobile-menu">
+        <button class="btn-primary" onclick="openModal('loginModal'); closeMobileMenu()">Login</button>
+        <button class="btn-secondary" onclick="openModal('registerModal'); closeMobileMenu()">Register</button>
+      </div>
     </div>
+
+    <!-- User Menu (Authenticated) -->
     <div id="userMenu" class="nav-buttons" style="display: none;">
       <span id="username" class="username-display"></span>
-      <button class="btn-primary" onclick="openModal('addCardModal')">Add Card</button>
+      <button class="btn-secondary" onclick="openModal('addCardModal')">Add Card</button>
       <button class="btn-secondary" onclick="logout()">Logout</button>
     </div>
   </nav>
 
   <!-- Main Content (only shown when authenticated) -->
   <div id="mainContent" style="display: none;">
-    <!-- Filter and Search Section -->
+    <!-- Filter and Search Section (Collapsible) -->
     <div class="filters-section">
-      <h2>Filter and Search Cards</h2>
-      <div class="filters-container">
+      <h2 class="filters-header" onclick="toggleFilters()">
+        Filter and Search Cards
+        <span id="filterToggleIcon" class="toggle-icon">▼</span>
+      </h2>
+      <div id="filtersContainer" class="filters-container" style="display: none;">
         <select id="occasionFilter" onchange="getCards()">
           <option value="">All Occasions</option>
         </select>
