@@ -7,12 +7,41 @@ const multerS3 = require("multer-s3");
 const { S3Client } = require("@aws-sdk/client-s3");
 const cors = require("cors");
 const path = require("path");
+const rateLimit = require("express-rate-limit");
 const Card = require("./models/Card");
 const authRoutes = require("./routes/auth");
 const authMiddleware = require("./middleware/auth");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Rate limiting configuration
+// General API rate limiter - applies to all requests
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { error: "Too many requests from this IP, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Strict rate limiter for authentication endpoints
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // Limit each IP to 5 registration/login attempts per hour
+  message: { error: "Too many authentication attempts from this IP, please try again after an hour." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Moderate rate limiter for card creation/upload
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 20, // Limit each IP to 20 card uploads per hour
+  message: { error: "Too many uploads from this IP, please try again later." },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // Configure AWS S3 Client
 const s3Client = new S3Client({
@@ -36,6 +65,9 @@ const corsOptions = {
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
+
+// Apply general rate limiter to all requests
+app.use(generalLimiter);
 
 app.use(express.static(path.join(__dirname, "../frontend")));
 
@@ -130,7 +162,7 @@ app.get("/occasions", authMiddleware, async (req, res) => {
 });
 
 // API to upload card data (protected)
-app.post("/upload", authMiddleware, upload.array("pages", 5), async (req, res) => {
+app.post("/upload", authMiddleware, uploadLimiter, upload.array("pages", 5), async (req, res) => {
   const { title, from, occasion, flipOrientation, note } = req.body;
   // S3 files have 'location' property with full URL
   const pages = req.files.map(file => file.location);

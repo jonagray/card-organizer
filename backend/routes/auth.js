@@ -1,12 +1,22 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const User = require('../models/User');
 const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
+// Rate limiter for auth endpoints
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // Limit each IP to 5 attempts per hour
+  message: { error: 'Too many authentication attempts from this IP, please try again after an hour.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Register a new user
-router.post('/register', async (req, res) => {
+router.post('/register', authLimiter, async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -52,7 +62,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login user
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
 
