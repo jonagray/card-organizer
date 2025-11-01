@@ -126,6 +126,7 @@ h2 {
 @media (max-width: 768px) {
   .navbar {
     padding: 12px 15px;
+    justify-content: flex-start;
   }
 
   .nav-brand {
@@ -133,15 +134,20 @@ h2 {
     flex-shrink: 0;
   }
 
+  /* Hide hamburger menu and login/register buttons on mobile when logged out */
+  .hamburger {
+    display: none !important;
+  }
+
   .mobile-menu {
-    flex-direction: column;
-    align-items: center;
+    display: none !important;
   }
 
-  .mobile-menu button {
-    width: 200px;
+  .nav-buttons {
+    display: none !important;
   }
 
+  /* Keep user menu visible when logged in */
   .user-menu {
     flex-direction: row;
     justify-content: space-between;
