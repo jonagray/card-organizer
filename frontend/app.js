@@ -8,6 +8,7 @@ const cardsPerPage = 10;
 let allCards = [];
 let allOccasions = new Set();
 let allFroms = new Set();
+let allTos = new Set();
 let currentPageIndex = 0;
 let cardPages = [];
 
@@ -195,6 +196,7 @@ async function getCards(resetFilters = false) {
   if (resetFilters) {
     document.getElementById("occasionFilter").value = "";
     document.getElementById("fromFilter").value = "";
+    document.getElementById("toFilter").value = "";
     document.getElementById("sortOrder").value = "newest";
     document.getElementById("searchQuery").value = "";
     currentPage = 1;
@@ -202,12 +204,14 @@ async function getCards(resetFilters = false) {
 
   const occasion = document.getElementById("occasionFilter").value;
   const from = document.getElementById("fromFilter").value;
+  const to = document.getElementById("toFilter").value;
   const sort = document.getElementById("sortOrder").value;
   const search = document.getElementById("searchQuery").value.trim();
 
   let url = `${API_URL}/cards?sort=${sort}&page=${currentPage}&limit=${cardsPerPage}`;
   if (occasion) url += `&occasion=${encodeURIComponent(occasion)}`;
   if (from) url += `&from=${encodeURIComponent(from)}`;
+  if (to) url += `&to=${encodeURIComponent(to)}`;
   if (search) url += `&search=${encodeURIComponent(search)}`;
 
   try {
@@ -237,6 +241,7 @@ async function getCards(resetFilters = false) {
       cardElement.innerHTML = `
         <h3>${card.title}</h3>
         <p><strong>From:</strong> ${card.from}</p>
+        <p><strong>To:</strong> ${card.to}</p>
         <p><strong>Occasion:</strong> ${card.occasion}</p>
         <div class="pages">
           <img src="${getImageUrl(card.pages[0])}" alt="Card page" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;"/>
@@ -251,6 +256,7 @@ async function getCards(resetFilters = false) {
 
       allOccasions.add(card.occasion);
       allFroms.add(card.from);
+      allTos.add(card.to);
     });
 
     updateFilters();
@@ -260,10 +266,11 @@ async function getCards(resetFilters = false) {
   }
 }
 
-// Function to Update Both Filters
+// Function to Update All Filters
 function updateFilters() {
   updateOccasionFilter();
   updateFromFilter();
+  updateToFilter();
 }
 
 // Function to Update the Occasion Filter
@@ -298,24 +305,42 @@ function updateFromFilter() {
   fromFilter.value = currentValue;
 }
 
+// Function to Update the To Filter
+function updateToFilter() {
+  const toFilter = document.getElementById("toFilter");
+  const currentValue = toFilter.value;
+  toFilter.innerHTML = `<option value="">All Recipients</option>`;
+
+  allTos.forEach((to) => {
+    const option = document.createElement("option");
+    option.value = to;
+    option.textContent = to;
+    toFilter.appendChild(option);
+  });
+
+  toFilter.value = currentValue;
+}
+
 // Function to Add a New Card
 async function addCard() {
   const title = document.getElementById('title').value.trim();
   const from = document.getElementById('from').value.trim();
+  const to = document.getElementById('to').value.trim();
   const occasion = document.getElementById('occasion').value.trim();
   const flipOrientation = document.getElementById('flipOrientation').value;
   const noteInput = document.getElementById('note');
   const pagesInput = document.getElementById('pages');
 
-  if (!title || !from || !occasion || pagesInput.files.length === 0) {
-    alert("Please fill in all fields and upload at least one image.");
+  if (!title || !from || !to || pagesInput.files.length === 0) {
+    alert("Please fill in all required fields and upload at least one image.");
     return;
   }
 
   const formData = new FormData();
   formData.append("title", title);
   formData.append("from", from);
-  formData.append("occasion", occasion);
+  formData.append("to", to);
+  formData.append("occasion", occasion || "Miscellaneous");
   formData.append("flipOrientation", flipOrientation);
   formData.append("note", noteInput?.value.trim() || "");
 
@@ -343,6 +368,7 @@ async function addCard() {
     // Clear form
     document.getElementById('title').value = '';
     document.getElementById('from').value = '';
+    document.getElementById('to').value = '';
     document.getElementById('occasion').value = '';
     document.getElementById('flipOrientation').value = 'horizontal';
     noteInput.value = '';
@@ -368,6 +394,7 @@ function viewCard(cardId) {
 
   document.getElementById('viewTitle').innerText = card.title;
   document.getElementById('viewFrom').innerText = card.from;
+  document.getElementById('viewTo').innerText = card.to;
   document.getElementById('viewOccasion').innerText = card.occasion;
 
   const viewNoteButton = document.getElementById('viewNoteButton');
@@ -457,6 +484,7 @@ function editCard(cardId) {
 
   document.getElementById('editTitle').value = card.title;
   document.getElementById('editFrom').value = card.from;
+  document.getElementById('editTo').value = card.to;
   document.getElementById('editOccasion').value = card.occasion;
   document.getElementById('editFlipOrientation').value = card.flipOrientation;
   document.getElementById('editNote').value = card.note || '';
@@ -472,7 +500,8 @@ async function saveEdit() {
   const updatedCard = {
     title: document.getElementById('editTitle').value,
     from: document.getElementById('editFrom').value,
-    occasion: document.getElementById('editOccasion').value,
+    to: document.getElementById('editTo').value,
+    occasion: document.getElementById('editOccasion').value || "Miscellaneous",
     flipOrientation: document.getElementById('editFlipOrientation').value,
     note: document.getElementById('editNote').value.trim()
   };
