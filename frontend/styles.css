@@ -347,7 +347,7 @@ textarea {
   width: 100%;
   max-height: 70vh;
   position: relative;
-  perspective: 1000px;
+  perspective: 2000px; /* Enhanced perspective for more pronounced 3D effect */
   margin-top: 20px;
   margin-bottom: 30px;
   display: flex;
@@ -356,15 +356,59 @@ textarea {
   padding-bottom: 20px; /* Add padding to create spacing between image and buttons */
 }
 
+/* Card Flipper - container for the 3D flip animation */
+.card-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+  transform-style: preserve-3d;
+  transform-origin: center;
+}
+
+/* Flipped states for different orientations */
+.card-flipper.flipped-horizontal {
+  transform: rotateY(180deg);
+}
+
+.card-flipper.flipped-vertical {
+  transform: rotateX(180deg);
+}
+
+/* Card Face - front and back faces */
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Front face - default position */
+.card-front {
+  transform: rotateY(0deg);
+}
+
+/* Back face - rotated 180 degrees to show on flip */
+.card-back.horizontal {
+  transform: rotateY(180deg);
+}
+
+.card-back.vertical {
+  transform: rotateX(180deg);
+}
+
 /* Page Image Styling */
 .page-image {
   max-width: 90%; /* Ensure the image doesn't extend beyond 90% of the container width */
   max-height: 65vh; /* Ensure the image doesn't cover the buttons */
   object-fit: contain; /* Maintain aspect ratio */
   object-position: center; /* Center the image */
-  transition: transform 0.8s ease, opacity 0.4s ease;
   backface-visibility: hidden;
-  transform-origin: center;
+  -webkit-backface-visibility: hidden;
 }
 
 /* Navigation Arrows */

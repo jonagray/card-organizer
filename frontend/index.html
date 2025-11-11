@@ -144,7 +144,14 @@
       <p><strong>From:</strong> <span id="viewFrom"></span></p>
       <p><strong>Occasion:</strong> <span id="viewOccasion"></span></p>
       <div id="pageContainer" class="page-container">
-        <img id="pageImage" src="" alt="Card page" class="page-image" />
+        <div id="cardFlipper" class="card-flipper">
+          <div class="card-face card-front">
+            <img id="pageFrontImage" src="" alt="Card page front" class="page-image" />
+          </div>
+          <div class="card-face card-back">
+            <img id="pageBackImage" src="" alt="Card page back" class="page-image" />
+          </div>
+        </div>
       </div>
       <div>
         <button id="viewNoteButton" style="display: none;" onclick="toggleNoteVisibility()">View Note</button>
