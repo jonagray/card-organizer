@@ -368,7 +368,7 @@ textarea {
 
 /* Flipped states for different orientations */
 .card-flipper.flipped-horizontal {
-  transform: rotateY(180deg);
+  transform: rotateY(-180deg);
 }
 
 .card-flipper.flipped-vertical {
@@ -394,7 +394,7 @@ textarea {
 
 /* Back face - rotated 180 degrees to show on flip */
 .card-back.horizontal {
-  transform: rotateY(180deg);
+  transform: rotateY(-180deg);
 }
 
 .card-back.vertical {
