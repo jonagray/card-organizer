@@ -241,7 +241,7 @@ async function getCards(resetFilters = false) {
       cardElement.innerHTML = `
         <h3>${card.title}</h3>
         <p><strong>From:</strong> ${card.from}</p>
-        <p><strong>To:</strong> ${card.to}</p>
+        <p><strong>To:</strong> ${card.to || 'Not specified'}</p>
         <p><strong>Occasion:</strong> ${card.occasion}</p>
         <div class="pages">
           <img src="${getImageUrl(card.pages[0])}" alt="Card page" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;"/>
@@ -256,7 +256,7 @@ async function getCards(resetFilters = false) {
 
       allOccasions.add(card.occasion);
       allFroms.add(card.from);
-      allTos.add(card.to);
+      if (card.to) allTos.add(card.to); // Only add non-empty "to" values
     });
 
     updateFilters();
@@ -394,7 +394,7 @@ function viewCard(cardId) {
 
   document.getElementById('viewTitle').innerText = card.title;
   document.getElementById('viewFrom').innerText = card.from;
-  document.getElementById('viewTo').innerText = card.to;
+  document.getElementById('viewTo').innerText = card.to || 'Not specified';
   document.getElementById('viewOccasion').innerText = card.occasion;
 
   const viewNoteButton = document.getElementById('viewNoteButton');
@@ -484,7 +484,7 @@ function editCard(cardId) {
 
   document.getElementById('editTitle').value = card.title;
   document.getElementById('editFrom').value = card.from;
-  document.getElementById('editTo').value = card.to;
+  document.getElementById('editTo').value = card.to || '';
   document.getElementById('editOccasion').value = card.occasion;
   document.getElementById('editFlipOrientation').value = card.flipOrientation;
   document.getElementById('editNote').value = card.note || '';
