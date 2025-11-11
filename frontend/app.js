@@ -388,29 +388,44 @@ function viewCard(cardId) {
   openModal('viewModal');
 }
 
+// Track whether card is currently flipped
+let isCardFlipped = false;
+
 // Function to Display Current Page
 function displayPage(initialLoad = false, flipOrientation = "horizontal") {
-  const pageImage = document.getElementById("pageImage");
+  const cardFlipper = document.getElementById("cardFlipper");
+  const frontImage = document.getElementById("pageFrontImage");
+  const backImage = document.getElementById("pageBackImage");
+  const cardBack = document.querySelector(".card-back");
+
+  // Set the back face rotation based on orientation
+  cardBack.className = `card-face card-back ${flipOrientation}`;
 
   if (initialLoad) {
-    pageImage.style.transition = "none";
-    pageImage.style.transform = "rotate(0deg)";
-    pageImage.src = getImageUrl(cardPages[currentPageIndex]);
+    // Initial load: reset flip state and show first page on front
+    isCardFlipped = false;
+    cardFlipper.className = "card-flipper";
+    frontImage.src = getImageUrl(cardPages[currentPageIndex]);
+    backImage.src = ""; // Clear back image
   } else {
-    const flipAxis = flipOrientation === "horizontal" ? "Y" : "X";
-    const angle = flipOrientation === "horizontal" ? "rotateY(-180deg)" : "rotateX(-180deg)";
+    // Determine which image is currently visible and which will be next
+    const currentImage = isCardFlipped ? backImage : frontImage;
+    const nextImage = isCardFlipped ? frontImage : backImage;
 
-    pageImage.style.transition = "transform 0.4s ease";
-    pageImage.style.transform = angle;
+    // Pre-load the next page image on the hidden face
+    nextImage.src = getImageUrl(cardPages[currentPageIndex]);
 
-    pageImage.addEventListener(
-      "transitionend",
-      () => {
-        pageImage.src = getImageUrl(cardPages[currentPageIndex]);
-        pageImage.style.transform = `rotate${flipAxis}(0deg)`;
-      },
-      { once: true }
-    );
+    // Toggle flip state
+    isCardFlipped = !isCardFlipped;
+
+    // Apply the flip animation by adding the appropriate class
+    const flipClass = flipOrientation === "horizontal" ? "flipped-horizontal" : "flipped-vertical";
+
+    if (isCardFlipped) {
+      cardFlipper.classList.add(flipClass);
+    } else {
+      cardFlipper.classList.remove(flipClass);
+    }
   }
 
   document.querySelector(".left-arrow").style.display = currentPageIndex === 0 ? "none" : "block";
@@ -550,12 +565,12 @@ function closeModal(modalId) {
     modal.style.display = "none";
   }, 300);
 
-  // Reset page image transform if it's the view modal
+  // Reset card flip state if it's the view modal
   if (modalId === 'viewModal') {
-    const pageImage = document.getElementById("pageImage");
-    if (pageImage) {
-      pageImage.style.transform = "rotateY(0deg)";
-      pageImage.style.transition = "none";
+    const cardFlipper = document.getElementById("cardFlipper");
+    if (cardFlipper) {
+      cardFlipper.className = "card-flipper"; // Remove any flip classes
+      isCardFlipped = false; // Reset flip state
     }
   }
 }
