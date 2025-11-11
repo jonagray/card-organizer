@@ -53,6 +53,10 @@
           <option value="">All Senders</option>
         </select>
 
+        <select id="toFilter" onchange="getCards()">
+          <option value="">All Recipients</option>
+        </select>
+
         <select id="sortOrder" onchange="getCards()">
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
@@ -119,6 +123,7 @@
       <div class="card-form">
         <input id="title" placeholder="Title" />
         <input id="from" placeholder="From" />
+        <input id="to" placeholder="To" />
         <input id="occasion" placeholder="Occasion" />
         <input id="pages" type="file" multiple accept="image/*" />
         <select id="flipOrientation">
@@ -142,6 +147,7 @@
       <span class="close" onclick="closeModal('viewModal')">&times;</span>
       <h2 id="viewTitle"></h2>
       <p><strong>From:</strong> <span id="viewFrom"></span></p>
+      <p><strong>To:</strong> <span id="viewTo"></span></p>
       <p><strong>Occasion:</strong> <span id="viewOccasion"></span></p>
       <div id="pageContainer" class="page-container">
         <div id="cardFlipper" class="card-flipper">
@@ -171,6 +177,7 @@
       <h3>Edit Card</h3>
       <input id="editTitle" placeholder="Title" />
       <input id="editFrom" placeholder="From" />
+      <input id="editTo" placeholder="To" />
       <input id="editOccasion" placeholder="Occasion" />
       <select id="editFlipOrientation">
         <option value="horizontal">Opens Left to Right (Book)</option>

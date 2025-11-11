@@ -110,7 +110,7 @@ app.get("/", (req, res) => {
 
 // Fetch cards with filtering, sorting, search, and pagination (protected)
 app.get("/cards", authMiddleware, async (req, res) => {
-  const { occasion, from, sort, search, page = 1, limit = 10 } = req.query;
+  const { occasion, from, to, sort, search, page = 1, limit = 10 } = req.query;
   const query = { userId: req.userId }; // Only show cards for the authenticated user
 
   // Apply occasion filter
@@ -119,11 +119,15 @@ app.get("/cards", authMiddleware, async (req, res) => {
   // Apply "From" filter
   if (from) query.from = from;
 
+  // Apply "To" filter
+  if (to) query.to = to;
+
   // Apply search filter
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: "i" } },
       { from: { $regex: search, $options: "i" } },
+      { to: { $regex: search, $options: "i" } },
       { occasion: { $regex: search, $options: "i" } }
     ];
   }
@@ -161,16 +165,27 @@ app.get("/occasions", authMiddleware, async (req, res) => {
   }
 });
 
+// Fetch unique "to" recipients (protected)
+app.get("/tos", authMiddleware, async (req, res) => {
+  try {
+    const tos = await Card.distinct("to", { userId: req.userId });
+    res.json(tos);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching recipients", error: err });
+  }
+});
+
 // API to upload card data (protected)
 app.post("/upload", authMiddleware, uploadLimiter, upload.array("pages", 5), async (req, res) => {
-  const { title, from, occasion, flipOrientation, note } = req.body;
+  const { title, from, to, occasion, flipOrientation, note } = req.body;
   // S3 files have 'location' property with full URL
   const pages = req.files.map(file => file.location);
 
   const card = new Card({
     title,
     from,
-    occasion,
+    to,
+    occasion: occasion || "Miscellaneous", // Default to "Miscellaneous" if not provided
     flipOrientation,
     note: note || "", // Add note if provided, or default to an empty string
     pages,
