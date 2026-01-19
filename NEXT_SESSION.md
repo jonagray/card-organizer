@@ -103,12 +103,27 @@ The welcome/landing page text is too light and difficult to read.
 
 ---
 
-### 5. [INCOMPLETE - TO BE SPECIFIED]
+### 5. Remove Header Bar Text
+**Priority: Medium**
+**Estimated Time: 10-15 minutes**
 
-**Priority: TBD**
-**Estimated Time: TBD**
+**Change:**
+Remove "Greeting card organizer" text from the header bar, leaving it blank/empty.
 
-- _Task description pending_
+**Fix:**
+- Locate header bar title/text element
+- Either remove the text entirely or replace with empty string
+- Ensure header bar maintains proper spacing/layout without text
+- Consider if logo or other visual element should remain
+
+**Files to modify:**
+- `frontend/index.html` - Header bar text/title element
+- `frontend/styles.css` - May need to adjust header spacing if text is removed
+
+**Elements to check:**
+- Header title/h1 element
+- Header bar height/padding
+- Any centered/aligned elements that depend on title text
 
 ---
 
