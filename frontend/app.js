@@ -25,6 +25,281 @@ function getImageUrl(imagePath) {
   return `${API_URL}${imagePath}`;
 }
 
+// Helper function to format array or string for display
+function formatPeopleList(people) {
+  if (!people) return 'Not specified';
+  if (Array.isArray(people)) {
+    return people.length > 0 ? people.join(', ') : 'Not specified';
+  }
+  return people;
+}
+
+// Autocomplete cache
+const autocompleteCache = {
+  from: [],
+  to: [],
+  occasion: [],
+  title: []
+};
+
+// Predefined occasions
+const predefinedOccasions = [
+  'Birthday', 'Christmas', 'Anniversary', 'Wedding',
+  'Graduation', 'Thank You', 'Get Well', 'Sympathy',
+  'Congratulations', "Valentine's Day", "Mother's Day",
+  "Father's Day", 'Easter', 'New Year', 'Baby Shower'
+];
+
+// Fetch autocomplete data from backend
+async function fetchAutocomplete(field) {
+  if (autocompleteCache[field].length > 0) {
+    return autocompleteCache[field];
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/autocomplete/${field}`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // For occasion, merge predefined + custom
+      if (field === 'occasion') {
+        const customOccasions = data.filter(o => !predefinedOccasions.includes(o));
+        autocompleteCache[field] = [...predefinedOccasions, ...customOccasions.sort()];
+      } else {
+        autocompleteCache[field] = data;
+      }
+    }
+  } catch (error) {
+    console.error(`Error fetching autocomplete for ${field}:`, error);
+  }
+
+  return autocompleteCache[field];
+}
+
+// Clear autocomplete cache (call when new card is added)
+function clearAutocompleteCache() {
+  autocompleteCache.from = [];
+  autocompleteCache.to = [];
+  autocompleteCache.occasion = [];
+  autocompleteCache.title = [];
+}
+
+// Create tag/chip input component
+function createTagInput(containerId, field, initialTags = []) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  // Store tags array
+  container.dataset.tags = JSON.stringify(initialTags);
+
+  // Clear and rebuild container
+  container.innerHTML = '';
+  container.className = 'tag-input-container';
+
+  // Add existing tags as chips
+  initialTags.forEach(tag => {
+    if (tag) addTagChip(container, tag);
+  });
+
+  // Add input field
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'tag-input';
+  input.placeholder = field === 'from' ? 'Add sender...' : 'Add recipient...';
+  input.dataset.field = field;
+
+  // Handle Enter and comma to add tags
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const value = input.value.trim().replace(/,/g, '');
+      if (value) {
+        addTagToContainer(container, value);
+        input.value = '';
+      }
+    } else if (e.key === 'Backspace' && input.value === '') {
+      // Remove last tag on backspace if input is empty
+      const tags = getTagsFromContainer(container);
+      if (tags.length > 0) {
+        tags.pop();
+        updateTagsInContainer(container, tags);
+      }
+    }
+  });
+
+  // Initialize autocomplete for this input
+  if (field === 'from' || field === 'to') {
+    initializeAutocomplete(input, field);
+  }
+
+  container.appendChild(input);
+}
+
+// Add a tag chip to the container
+function addTagChip(container, tagText) {
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerHTML = `
+    ${tagText}
+    <span class="remove-tag" onclick="removeTag(this)">×</span>
+  `;
+
+  // Insert before the input field
+  const input = container.querySelector('.tag-input');
+  if (input) {
+    container.insertBefore(tag, input);
+  } else {
+    container.appendChild(tag);
+  }
+}
+
+// Add tag to container (updates data attribute)
+function addTagToContainer(container, tagText) {
+  const tags = getTagsFromContainer(container);
+  if (!tags.includes(tagText)) {
+    tags.push(tagText);
+    updateTagsInContainer(container, tags);
+  }
+}
+
+// Get tags array from container
+function getTagsFromContainer(container) {
+  try {
+    return JSON.parse(container.dataset.tags || '[]');
+  } catch {
+    return [];
+  }
+}
+
+// Update tags in container and rebuild UI
+function updateTagsInContainer(container, tags) {
+  const field = container.querySelector('.tag-input')?.dataset.field || 'from';
+  createTagInput(container.id, field, tags);
+}
+
+// Remove tag (called from onclick in chip)
+function removeTag(removeButton) {
+  const chip = removeButton.parentElement;
+  const container = chip.parentElement;
+  const tagText = chip.textContent.replace('×', '').trim();
+
+  const tags = getTagsFromContainer(container);
+  const index = tags.indexOf(tagText);
+  if (index > -1) {
+    tags.splice(index, 1);
+    updateTagsInContainer(container, tags);
+  }
+}
+
+// Initialize autocomplete on an input element
+function initializeAutocomplete(inputElement, field) {
+  // Create autocomplete dropdown
+  const dropdown = document.createElement('div');
+  dropdown.className = 'autocomplete-dropdown';
+  dropdown.style.display = 'none';
+
+  // Position dropdown relative to input's container
+  const container = inputElement.closest('.tag-input-container') || inputElement.parentElement;
+  if (!container.style.position) {
+    container.style.position = 'relative';
+  }
+  container.appendChild(dropdown);
+
+  let selectedIndex = -1;
+
+  // Show dropdown on focus
+  inputElement.addEventListener('focus', async () => {
+    const suggestions = await fetchAutocomplete(field);
+    showDropdown(inputElement, dropdown, suggestions, field);
+  });
+
+  // Filter dropdown as user types
+  inputElement.addEventListener('input', async () => {
+    const value = inputElement.value.toLowerCase();
+    const suggestions = await fetchAutocomplete(field);
+    const filtered = suggestions.filter(s => s.toLowerCase().includes(value));
+    showDropdown(inputElement, dropdown, filtered, field);
+    selectedIndex = -1;
+  });
+
+  // Handle keyboard navigation
+  inputElement.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('.autocomplete-item');
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items, selectedIndex);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, 0);
+      updateSelection(items, selectedIndex);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      items[selectedIndex]?.click();
+    } else if (e.key === 'Escape') {
+      dropdown.style.display = 'none';
+      selectedIndex = -1;
+    }
+  });
+
+  // Hide dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target)) {
+      dropdown.style.display = 'none';
+      selectedIndex = -1;
+    }
+  });
+}
+
+// Show autocomplete dropdown with suggestions
+function showDropdown(inputElement, dropdown, suggestions, field) {
+  dropdown.innerHTML = '';
+
+  if (suggestions.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  suggestions.forEach(suggestion => {
+    const item = document.createElement('div');
+    item.className = 'autocomplete-item';
+    item.textContent = suggestion;
+
+    item.addEventListener('click', () => {
+      // For tag inputs, add to tags
+      const container = inputElement.closest('.tag-input-container');
+      if (container) {
+        addTagToContainer(container, suggestion);
+        inputElement.value = '';
+      } else {
+        // For regular inputs, just set the value
+        inputElement.value = suggestion;
+      }
+      dropdown.style.display = 'none';
+    });
+
+    dropdown.appendChild(item);
+  });
+
+  dropdown.style.display = 'block';
+}
+
+// Update selected item in dropdown
+function updateSelection(items, selectedIndex) {
+  items.forEach((item, index) => {
+    if (index === selectedIndex) {
+      item.classList.add('selected');
+      item.scrollIntoView({ block: 'nearest' });
+    } else {
+      item.classList.remove('selected');
+    }
+  });
+}
+
 // Initialize app on page load
 document.addEventListener("DOMContentLoaded", () => {
   checkAuth();
@@ -240,8 +515,8 @@ async function getCards(resetFilters = false) {
       cardElement.classList.add("card");
       cardElement.innerHTML = `
         <h3>${card.title}</h3>
-        <p><strong>From:</strong> ${card.from}</p>
-        <p><strong>To:</strong> ${card.to || 'Not specified'}</p>
+        <p><strong>From:</strong> ${formatPeopleList(card.from)}</p>
+        <p><strong>To:</strong> ${formatPeopleList(card.to)}</p>
         <p><strong>Occasion:</strong> ${card.occasion}</p>
         <div class="pages">
           <img src="${getImageUrl(card.pages[0])}" alt="Card page" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px;"/>
@@ -255,8 +530,19 @@ async function getCards(resetFilters = false) {
       cardsDiv.appendChild(cardElement);
 
       allOccasions.add(card.occasion);
-      allFroms.add(card.from);
-      if (card.to) allTos.add(card.to); // Only add non-empty "to" values
+      // Handle arrays for from/to
+      if (Array.isArray(card.from)) {
+        card.from.forEach(name => allFroms.add(name));
+      } else {
+        allFroms.add(card.from);
+      }
+      if (card.to) {
+        if (Array.isArray(card.to)) {
+          card.to.forEach(name => allTos.add(name));
+        } else {
+          allTos.add(card.to);
+        }
+      }
     });
 
     updateFilters();
@@ -324,22 +610,22 @@ function updateToFilter() {
 // Function to Add a New Card
 async function addCard() {
   const title = document.getElementById('title').value.trim();
-  const from = document.getElementById('from').value.trim();
-  const to = document.getElementById('to').value.trim();
+  const fromTags = getTagsFromContainer(document.getElementById('fromTagInput'));
+  const toTags = getTagsFromContainer(document.getElementById('toTagInput'));
   const occasion = document.getElementById('occasion').value.trim();
   const flipOrientation = document.getElementById('flipOrientation').value;
   const noteInput = document.getElementById('note');
   const pagesInput = document.getElementById('pages');
 
-  if (!title || !from || !to || pagesInput.files.length === 0) {
+  if (!title || fromTags.length === 0 || toTags.length === 0 || pagesInput.files.length === 0) {
     alert("Please fill in all required fields and upload at least one image.");
     return;
   }
 
   const formData = new FormData();
   formData.append("title", title);
-  formData.append("from", from);
-  formData.append("to", to);
+  formData.append("from", JSON.stringify(fromTags));
+  formData.append("to", JSON.stringify(toTags));
   formData.append("occasion", occasion || "Miscellaneous");
   formData.append("flipOrientation", flipOrientation);
   formData.append("note", noteInput?.value.trim() || "");
@@ -367,14 +653,17 @@ async function addCard() {
 
     // Clear form
     document.getElementById('title').value = '';
-    document.getElementById('from').value = '';
-    document.getElementById('to').value = '';
+    createTagInput('fromTagInput', 'from', []);
+    createTagInput('toTagInput', 'to', []);
     document.getElementById('occasion').value = '';
     document.getElementById('flipOrientation').value = 'horizontal';
     noteInput.value = '';
     pagesInput.value = '';
     document.getElementById('addNoteCheckbox').checked = false;
     noteInput.style.display = 'none';
+
+    // Clear autocomplete cache so new values appear
+    clearAutocompleteCache();
 
     closeModal('addCardModal');
     getCards();
@@ -393,8 +682,8 @@ function viewCard(cardId) {
   currentPageIndex = 0;
 
   document.getElementById('viewTitle').innerText = card.title;
-  document.getElementById('viewFrom').innerText = card.from;
-  document.getElementById('viewTo').innerText = card.to || 'Not specified';
+  document.getElementById('viewFrom').innerText = formatPeopleList(card.from);
+  document.getElementById('viewTo').innerText = formatPeopleList(card.to);
   document.getElementById('viewOccasion').innerText = card.occasion;
 
   const viewNoteButton = document.getElementById('viewNoteButton');
@@ -483,11 +772,23 @@ function editCard(cardId) {
   if (!card) return alert('Card not found');
 
   document.getElementById('editTitle').value = card.title;
-  document.getElementById('editFrom').value = card.from;
-  document.getElementById('editTo').value = card.to || '';
+
+  // Initialize tag inputs with card data
+  const fromArray = Array.isArray(card.from) ? card.from : (card.from ? [card.from] : []);
+  const toArray = Array.isArray(card.to) ? card.to : (card.to ? [card.to] : []);
+  createTagInput('editFromTagInput', 'from', fromArray);
+  createTagInput('editToTagInput', 'to', toArray);
+
   document.getElementById('editOccasion').value = card.occasion;
   document.getElementById('editFlipOrientation').value = card.flipOrientation;
   document.getElementById('editNote').value = card.note || '';
+
+  // Initialize autocomplete for occasion field in edit modal
+  const editOccasionInput = document.getElementById('editOccasion');
+  if (editOccasionInput && !editOccasionInput.dataset.autocompleteInitialized) {
+    initializeAutocomplete(editOccasionInput, 'occasion');
+    editOccasionInput.dataset.autocompleteInitialized = 'true';
+  }
 
   const editModal = document.getElementById('editModal');
   editModal.dataset.cardId = card._id;
@@ -497,10 +798,13 @@ function editCard(cardId) {
 // Function to Save Edited Card
 async function saveEdit() {
   const cardId = document.getElementById('editModal').dataset.cardId;
+  const fromTags = getTagsFromContainer(document.getElementById('editFromTagInput'));
+  const toTags = getTagsFromContainer(document.getElementById('editToTagInput'));
+
   const updatedCard = {
     title: document.getElementById('editTitle').value,
-    from: document.getElementById('editFrom').value,
-    to: document.getElementById('editTo').value,
+    from: fromTags,
+    to: toTags,
     occasion: document.getElementById('editOccasion').value || "Miscellaneous",
     flipOrientation: document.getElementById('editFlipOrientation').value,
     note: document.getElementById('editNote').value.trim()
@@ -524,6 +828,7 @@ async function saveEdit() {
     if (!response.ok) throw new Error('Failed to update card');
 
     alert('Card updated successfully!');
+    clearAutocompleteCache();
     closeModal('editModal');
     getCards();
   } catch (error) {
@@ -583,6 +888,18 @@ function openModal(modalId) {
   const modal = document.getElementById(modalId);
   modal.style.display = 'flex';
   modal.classList.add('show');
+
+  // Initialize tag inputs for add card modal
+  if (modalId === 'addCardModal') {
+    createTagInput('fromTagInput', 'from', []);
+    createTagInput('toTagInput', 'to', []);
+    // Initialize autocomplete for occasion field
+    const occasionInput = document.getElementById('occasion');
+    if (occasionInput && !occasionInput.dataset.autocompleteInitialized) {
+      initializeAutocomplete(occasionInput, 'occasion');
+      occasionInput.dataset.autocompleteInitialized = 'true';
+    }
+  }
 }
 
 // Function to Close Modal

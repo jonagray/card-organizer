@@ -1000,3 +1000,126 @@ button:active {
 .btn-secondary:active {
   transform: translateY(0) scale(0.98);
 }
+
+/* Tag Input Component */
+.tag-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  padding: 8px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  align-items: center;
+  min-height: 44px;
+  background: white;
+  cursor: text;
+  transition: border-color 0.3s ease;
+  margin: 10px 0;
+}
+
+.tag-input-container:focus-within {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 15px;
+  font-size: 0.9em;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tag .remove-tag {
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0 4px;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.tag .remove-tag:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.tag-input {
+  border: none;
+  outline: none;
+  flex-grow: 1;
+  min-width: 100px;
+  font-size: 1em;
+  padding: 4px;
+  font-family: inherit;
+}
+
+/* Autocomplete Dropdown */
+.autocomplete-container {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 2px solid #ff6b35;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-dropdown.show {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.selected {
+  background: rgba(255, 107, 53, 0.1);
+}
+
+.autocomplete-item.selected {
+  font-weight: 600;
+}
+
+/* Mobile optimizations for autocomplete */
+@media (max-width: 768px) {
+  .autocomplete-dropdown {
+    max-height: 150px;
+  }
+
+  .autocomplete-item {
+    padding: 12px 15px;
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+
+  .tag {
+    font-size: 0.85em;
+    padding: 5px 10px;
+  }
+
+  .tag-input {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+}

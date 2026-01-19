@@ -122,8 +122,10 @@
       <h2>Add a New Card</h2>
       <div class="card-form">
         <input id="title" placeholder="Title" />
-        <input id="from" placeholder="From" />
-        <input id="to" placeholder="To" />
+        <label>From (senders):</label>
+        <div id="fromTagInput"></div>
+        <label>To (recipients):</label>
+        <div id="toTagInput"></div>
         <input id="occasion" placeholder="Occasion" />
         <input id="pages" type="file" multiple accept="image/*" />
         <select id="flipOrientation">
@@ -176,8 +178,10 @@
       <span class="close" onclick="closeModal('editModal')">&times;</span>
       <h3>Edit Card</h3>
       <input id="editTitle" placeholder="Title" />
-      <input id="editFrom" placeholder="From" />
-      <input id="editTo" placeholder="To" />
+      <label>From (senders):</label>
+      <div id="editFromTagInput"></div>
+      <label>To (recipients):</label>
+      <div id="editToTagInput"></div>
       <input id="editOccasion" placeholder="Occasion" />
       <select id="editFlipOrientation">
         <option value="horizontal">Opens Left to Right (Book)</option>
