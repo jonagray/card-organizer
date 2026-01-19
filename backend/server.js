@@ -311,7 +311,8 @@ app.delete("/cards/:id", authMiddleware, async (req, res) => {
 
 // Migration endpoint - converts from/to fields from String to Array
 // WARNING: This is a one-time operation. Only run once!
-app.post("/migrate-to-arrays", async (req, res) => {
+// Access via browser: https://your-railway-url.up.railway.app/migrate-to-arrays
+app.get("/migrate-to-arrays", async (req, res) => {
   try {
     const db = mongoose.connection.db;
     const cardsCollection = db.collection('cards');
