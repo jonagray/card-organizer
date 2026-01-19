@@ -116,18 +116,18 @@ app.get("/cards", authMiddleware, async (req, res) => {
   // Apply occasion filter
   if (occasion) query.occasion = occasion;
 
-  // Apply "From" filter
-  if (from) query.from = from;
+  // Apply "From" filter (now supports arrays)
+  if (from) query.from = { $in: [from] };
 
-  // Apply "To" filter
-  if (to) query.to = to;
+  // Apply "To" filter (now supports arrays)
+  if (to) query.to = { $in: [to] };
 
-  // Apply search filter
+  // Apply search filter (updated for array fields)
   if (search) {
     query.$or = [
       { title: { $regex: search, $options: "i" } },
-      { from: { $regex: search, $options: "i" } },
-      { to: { $regex: search, $options: "i" } },
+      { from: { $elemMatch: { $regex: search, $options: "i" } } },
+      { to: { $elemMatch: { $regex: search, $options: "i" } } },
       { occasion: { $regex: search, $options: "i" } }
     ];
   }
@@ -165,21 +165,83 @@ app.get("/occasions", authMiddleware, async (req, res) => {
   }
 });
 
-// Fetch unique "to" recipients (protected)
+// Fetch unique "to" recipients (protected) - updated for array fields
 app.get("/tos", authMiddleware, async (req, res) => {
   try {
-    const tos = await Card.distinct("to", { userId: req.userId });
-    res.json(tos);
+    const cards = await Card.find({ userId: req.userId }, 'to');
+    const uniqueTo = [...new Set(cards.flatMap(card => card.to))].filter(Boolean);
+    res.json(uniqueTo);
   } catch (err) {
     res.status(500).json({ message: "Error fetching recipients", error: err });
   }
 });
 
+// Fetch unique "from" senders (protected) - new endpoint for array fields
+app.get("/froms", authMiddleware, async (req, res) => {
+  try {
+    const cards = await Card.find({ userId: req.userId }, 'from');
+    const uniqueFrom = [...new Set(cards.flatMap(card => card.from))].filter(Boolean);
+    res.json(uniqueFrom);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching senders", error: err });
+  }
+});
+
+// Autocomplete endpoint for all fields (protected)
+app.get("/autocomplete/:field", authMiddleware, async (req, res) => {
+  try {
+    const { field } = req.params;
+    const allowedFields = ['from', 'to', 'occasion', 'title'];
+
+    if (!allowedFields.includes(field)) {
+      return res.status(400).json({ message: "Invalid field for autocomplete" });
+    }
+
+    let uniqueValues;
+    if (field === 'from' || field === 'to') {
+      // For array fields, flatten and get unique values
+      const cards = await Card.find({ userId: req.userId }, field);
+      uniqueValues = [...new Set(cards.flatMap(card => card[field]))].filter(Boolean);
+    } else {
+      // For string fields, use distinct
+      uniqueValues = await Card.distinct(field, { userId: req.userId });
+    }
+
+    res.json(uniqueValues.sort());
+  } catch (err) {
+    res.status(500).json({ message: `Error fetching autocomplete for ${req.params.field}`, error: err });
+  }
+});
+
 // API to upload card data (protected)
 app.post("/upload", authMiddleware, uploadLimiter, upload.array("pages", 5), async (req, res) => {
-  const { title, from, to, occasion, flipOrientation, note } = req.body;
+  let { title, from, to, occasion, flipOrientation, note } = req.body;
   // S3 files have 'location' property with full URL
   const pages = req.files.map(file => file.location);
+
+  // Convert from/to to arrays if they're strings (handles JSON or comma-separated values)
+  if (typeof from === 'string') {
+    try {
+      // Try parsing as JSON first
+      from = JSON.parse(from);
+    } catch (e) {
+      // If not JSON, treat as comma-separated or single value
+      from = from.split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
+  if (typeof to === 'string') {
+    try {
+      // Try parsing as JSON first
+      to = JSON.parse(to);
+    } catch (e) {
+      // If not JSON, treat as comma-separated or single value
+      to = to.split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
+
+  // Ensure from/to are arrays
+  from = Array.isArray(from) ? from : [from].filter(Boolean);
+  to = Array.isArray(to) ? to : [to].filter(Boolean);
 
   const card = new Card({
     title,
@@ -205,6 +267,24 @@ app.put("/cards/:id", authMiddleware, async (req, res) => {
   try {
     // Don't allow updating userId
     delete req.body.userId;
+
+    // Convert from/to to arrays if they're strings
+    if (req.body.from && typeof req.body.from === 'string') {
+      try {
+        req.body.from = JSON.parse(req.body.from);
+      } catch (e) {
+        req.body.from = req.body.from.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      req.body.from = Array.isArray(req.body.from) ? req.body.from : [req.body.from].filter(Boolean);
+    }
+    if (req.body.to && typeof req.body.to === 'string') {
+      try {
+        req.body.to = JSON.parse(req.body.to);
+      } catch (e) {
+        req.body.to = req.body.to.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      req.body.to = Array.isArray(req.body.to) ? req.body.to : [req.body.to].filter(Boolean);
+    }
 
     const updatedCard = await Card.findOneAndUpdate(
       { _id: req.params.id, userId: req.userId },

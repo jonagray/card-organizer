@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 
 const cardSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  from: { type: String, required: true },
-  to: { type: String, default: "" }, // Optional, for backward compatibility with existing cards
+  from: { type: [String], required: true }, // Array of sender names
+  to: { type: [String], default: [] }, // Array of recipient names
   occasion: { type: String, default: "Miscellaneous" },
   pages: { type: [String], required: true }, // Array of image URLs or paths
   flipOrientation: { type: String, default: "horizontal" }, // Orientation of the card
