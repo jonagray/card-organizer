@@ -78,7 +78,32 @@ Make a slight adjustment to slow down the card flip transition for better visual
 
 ---
 
-### 4. [INCOMPLETE - TO BE SPECIFIED]
+### 4. Darken Welcome Page Text
+**Priority: High**
+**Estimated Time: 15-30 minutes**
+
+**Issue:**
+The welcome/landing page text is too light and difficult to read.
+
+**Fix:**
+- Increase text color darkness for better readability
+- Ensure WCAG AA contrast ratio compliance (4.5:1 for normal text, 3:1 for large text)
+- Test against new orange gradient background
+- May need to adjust text shadows or add background overlays for readability
+
+**Files to modify:**
+- `frontend/styles.css` - Welcome page text color
+- `frontend/index.html` - If inline styles exist on welcome text
+
+**Elements to check:**
+- Hero/welcome heading text
+- Subtitle/description text
+- Any call-to-action text on landing page
+- Login/signup form labels if they're part of welcome page
+
+---
+
+### 5. [INCOMPLETE - TO BE SPECIFIED]
 
 **Priority: TBD**
 **Estimated Time: TBD**
@@ -97,6 +122,7 @@ After implementing fixes:
 - [ ] Test add card form on mobile (no zoom issue)
 - [ ] Test edit card form on mobile (no zoom issue)
 - [ ] Verify card flip animation speed feels natural
+- [ ] Verify welcome page text is readable against new orange background
 - [ ] Check accessibility (contrast ratios, focus states)
 - [ ] Test across different screen sizes
 
