@@ -136,12 +136,13 @@ function createTagInput(containerId, field, initialTags = []) {
     }
   });
 
-  // Initialize autocomplete for this input
+  // Append input to container first
+  container.appendChild(input);
+
+  // Initialize autocomplete for this input (after appending to DOM)
   if (field === 'from' || field === 'to') {
     initializeAutocomplete(input, field);
   }
-
-  container.appendChild(input);
 }
 
 // Add a tag chip to the container
