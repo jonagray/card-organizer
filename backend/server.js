@@ -309,6 +309,75 @@ app.delete("/cards/:id", authMiddleware, async (req, res) => {
   }
 });
 
+// Migration endpoint - converts from/to fields from String to Array
+// WARNING: This is a one-time operation. Only run once!
+app.post("/migrate-to-arrays", async (req, res) => {
+  try {
+    const db = mongoose.connection.db;
+    const cardsCollection = db.collection('cards');
+
+    // Find all cards where 'from' or 'to' are strings (not arrays)
+    const cardsToMigrate = await cardsCollection.find({
+      $or: [
+        { from: { $type: 'string' } },
+        { to: { $type: 'string' } }
+      ]
+    }).toArray();
+
+    if (cardsToMigrate.length === 0) {
+      return res.json({
+        message: "No cards need migration. All cards already use array format.",
+        migratedCount: 0,
+        totalProcessed: 0
+      });
+    }
+
+    let migratedCount = 0;
+    let errorCount = 0;
+    const errors = [];
+
+    for (const card of cardsToMigrate) {
+      try {
+        const updateFields = {};
+
+        // Convert 'from' if it's a string
+        if (typeof card.from === 'string') {
+          updateFields.from = card.from.trim() ? [card.from.trim()] : [];
+        }
+
+        // Convert 'to' if it's a string
+        if (typeof card.to === 'string') {
+          updateFields.to = card.to.trim() ? [card.to.trim()] : [];
+        }
+
+        // Update the card
+        await cardsCollection.updateOne(
+          { _id: card._id },
+          { $set: updateFields }
+        );
+
+        migratedCount++;
+      } catch (err) {
+        errorCount++;
+        errors.push({ cardId: card._id, error: err.message });
+      }
+    }
+
+    res.json({
+      message: "Migration completed",
+      migratedCount,
+      errorCount,
+      totalProcessed: cardsToMigrate.length,
+      errors: errors.length > 0 ? errors : undefined
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Migration failed",
+      error: err.message
+    });
+  }
+});
+
 // Start the server
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
