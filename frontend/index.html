@@ -177,18 +177,20 @@
     <div class="modal-content" onclick="event.stopPropagation()">
       <span class="close" onclick="closeModal('editModal')">&times;</span>
       <h3>Edit Card</h3>
-      <input id="editTitle" placeholder="Title" />
-      <label>From (senders):</label>
-      <div id="editFromTagInput"></div>
-      <label>To (recipients):</label>
-      <div id="editToTagInput"></div>
-      <input id="editOccasion" placeholder="Occasion" />
-      <select id="editFlipOrientation">
-        <option value="horizontal">Opens Left to Right (Book)</option>
-        <option value="vertical">Opens Bottom to Top (Calendar)</option>
-      </select>
-      <textarea id="editNote" placeholder="Edit your note here..."></textarea>
-      <button onclick="saveEdit()">Save Changes</button>
+      <div class="card-form">
+        <input id="editTitle" placeholder="Title" />
+        <label>From (senders):</label>
+        <div id="editFromTagInput"></div>
+        <label>To (recipients):</label>
+        <div id="editToTagInput"></div>
+        <input id="editOccasion" placeholder="Occasion" />
+        <select id="editFlipOrientation">
+          <option value="horizontal">Opens Left to Right (Book)</option>
+          <option value="vertical">Opens Bottom to Top (Calendar)</option>
+        </select>
+        <textarea id="editNote" placeholder="Edit your note here..."></textarea>
+        <button onclick="saveEdit()">Save Changes</button>
+      </div>
     </div>
   </div>
 
