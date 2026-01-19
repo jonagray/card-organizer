@@ -114,11 +114,17 @@ function createTagInput(containerId, field, initialTags = []) {
   // Handle Enter and comma to add tags
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ',') {
-      e.preventDefault();
-      const value = input.value.trim().replace(/,/g, '');
-      if (value) {
-        addTagToContainer(container, value);
-        input.value = '';
+      // Only handle if autocomplete dropdown is not visible
+      const dropdown = container.querySelector('.autocomplete-dropdown');
+      const autocompleteVisible = dropdown && dropdown.style.display !== 'none';
+
+      if (!autocompleteVisible || e.key === ',') {
+        e.preventDefault();
+        const value = input.value.trim().replace(/,/g, '');
+        if (value) {
+          addTagToContainer(container, value);
+          input.value = '';
+        }
       }
     } else if (e.key === 'Backspace' && input.value === '') {
       // Remove last tag on backspace if input is empty
@@ -196,6 +202,12 @@ function removeTag(removeButton) {
 
 // Initialize autocomplete on an input element
 function initializeAutocomplete(inputElement, field) {
+  // Prevent duplicate initialization
+  if (inputElement.dataset.autocompleteInitialized) {
+    return;
+  }
+  inputElement.dataset.autocompleteInitialized = 'true';
+
   // Create autocomplete dropdown
   const dropdown = document.createElement('div');
   dropdown.className = 'autocomplete-dropdown';
@@ -798,11 +810,24 @@ function editCard(cardId) {
 // Function to Save Edited Card
 async function saveEdit() {
   const cardId = document.getElementById('editModal').dataset.cardId;
-  const fromTags = getTagsFromContainer(document.getElementById('editFromTagInput'));
-  const toTags = getTagsFromContainer(document.getElementById('editToTagInput'));
+  const fromContainer = document.getElementById('editFromTagInput');
+  const toContainer = document.getElementById('editToTagInput');
+
+  if (!fromContainer || !toContainer) {
+    alert('Error: Form not properly initialized. Please try again.');
+    return;
+  }
+
+  const fromTags = getTagsFromContainer(fromContainer);
+  const toTags = getTagsFromContainer(toContainer);
+
+  if (!document.getElementById('editTitle').value.trim() || fromTags.length === 0 || toTags.length === 0) {
+    alert('Please fill in all required fields (Title, From, and To).');
+    return;
+  }
 
   const updatedCard = {
-    title: document.getElementById('editTitle').value,
+    title: document.getElementById('editTitle').value.trim(),
     from: fromTags,
     to: toTags,
     occasion: document.getElementById('editOccasion').value || "Miscellaneous",
