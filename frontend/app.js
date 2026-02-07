@@ -4,7 +4,8 @@ let currentUser = null;
 
 // Card State
 let currentPage = 1;
-const cardsPerPage = 10;
+let totalPages = 1;
+const cardsPerPage = 20;
 let allCards = [];
 let allOccasions = new Set();
 let allFroms = new Set();
@@ -474,6 +475,12 @@ function logout(showAlert = true) {
   showUnauthenticatedView();
 }
 
+// Apply filters and reset to page 1
+function applyFilters() {
+  currentPage = 1;
+  getCards();
+}
+
 // Function to Fetch and Display All Cards
 async function getCards(resetFilters = false) {
   if (!authToken) {
@@ -514,12 +521,19 @@ async function getCards(resetFilters = false) {
       return;
     }
 
-    allCards = await response.json();
+    const data = await response.json();
+    allCards = data.cards || [];
+    const pagination = data.pagination || { currentPage: 1, totalPages: 1, totalCards: 0 };
+
+    totalPages = pagination.totalPages;
+    currentPage = pagination.currentPage;
+
     const cardsDiv = document.getElementById("cards");
     cardsDiv.innerHTML = "";
 
     if (allCards.length === 0) {
       cardsDiv.innerHTML = '<p style="text-align: center; color: #999; grid-column: 1/-1;">No cards found. Click "Add Card" to create your first card!</p>';
+      updatePaginationControls();
       return;
     }
 
@@ -559,10 +573,48 @@ async function getCards(resetFilters = false) {
     });
 
     updateFilters();
+    updatePaginationControls();
   } catch (error) {
     console.error("Error fetching cards:", error);
     alert('Error loading cards. Please try again.');
   }
+}
+
+// Update pagination controls
+function updatePaginationControls() {
+  const paginationDiv = document.getElementById('paginationControls');
+  if (!paginationDiv) return;
+
+  // Hide pagination if only one page
+  if (totalPages <= 1) {
+    paginationDiv.style.display = 'none';
+    return;
+  }
+
+  paginationDiv.style.display = 'flex';
+
+  const prevButton = currentPage > 1
+    ? `<button class="btn-secondary" onclick="changePage(${currentPage - 1})">← Previous</button>`
+    : `<button class="btn-secondary" disabled>← Previous</button>`;
+
+  const nextButton = currentPage < totalPages
+    ? `<button class="btn-secondary" onclick="changePage(${currentPage + 1})">Next →</button>`
+    : `<button class="btn-secondary" disabled>Next →</button>`;
+
+  paginationDiv.innerHTML = `
+    ${prevButton}
+    <span class="page-info">Page ${currentPage} of ${totalPages}</span>
+    ${nextButton}
+  `;
+}
+
+// Navigate to a specific page
+function changePage(page) {
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  getCards();
+  // Scroll to top of cards section
+  document.getElementById('cards').scrollIntoView({ behavior: 'smooth' });
 }
 
 // Function to Update All Filters

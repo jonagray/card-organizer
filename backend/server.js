@@ -133,12 +133,23 @@ app.get("/cards", authMiddleware, async (req, res) => {
   }
 
   try {
+    // Get total count for pagination
+    const totalCards = await Card.countDocuments(query);
+
     const cards = await Card.find(query)
       .sort(sort === 'newest' ? { upload_date: -1 } : { upload_date: 1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    res.json(cards);
+    res.json({
+      cards,
+      pagination: {
+        currentPage: Number(page),
+        totalPages: Math.ceil(totalCards / limit),
+        totalCards,
+        cardsPerPage: Number(limit)
+      }
+    });
   } catch (err) {
     res.status(500).json({ message: "Error fetching cards", error: err });
   }
