@@ -522,11 +522,20 @@ async function getCards(resetFilters = false) {
     }
 
     const data = await response.json();
-    allCards = data.cards || [];
-    const pagination = data.pagination || { currentPage: 1, totalPages: 1, totalCards: 0 };
 
-    totalPages = pagination.totalPages;
-    currentPage = pagination.currentPage;
+    // Handle both old format (array) and new format (object with cards + pagination)
+    if (Array.isArray(data)) {
+      // Old format - just an array of cards
+      allCards = data;
+      totalPages = 1;
+      currentPage = 1;
+    } else {
+      // New format - object with cards and pagination
+      allCards = data.cards || [];
+      const pagination = data.pagination || { currentPage: 1, totalPages: 1, totalCards: 0 };
+      totalPages = pagination.totalPages;
+      currentPage = pagination.currentPage;
+    }
 
     const cardsDiv = document.getElementById("cards");
     cardsDiv.innerHTML = "";
