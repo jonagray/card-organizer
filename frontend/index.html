@@ -45,25 +45,25 @@
         <span id="filterToggleIcon" class="toggle-icon">▼</span>
       </h2>
       <div id="filtersContainer" class="filters-container" style="display: none;">
-        <select id="occasionFilter" onchange="getCards()">
+        <select id="occasionFilter" onchange="applyFilters()">
           <option value="">All Occasions</option>
         </select>
 
-        <select id="fromFilter" onchange="getCards()">
+        <select id="fromFilter" onchange="applyFilters()">
           <option value="">All Senders</option>
         </select>
 
-        <select id="toFilter" onchange="getCards()">
+        <select id="toFilter" onchange="applyFilters()">
           <option value="">All Recipients</option>
         </select>
 
-        <select id="sortOrder" onchange="getCards()">
+        <select id="sortOrder" onchange="applyFilters()">
           <option value="newest">Newest First</option>
           <option value="oldest">Oldest First</option>
         </select>
 
         <input type="text" id="searchQuery" placeholder="Search cards..." />
-        <button class="btn-primary" onclick="getCards()">Search</button>
+        <button class="btn-primary" onclick="applyFilters()">Search</button>
         <button class="btn-secondary" onclick="getCards(true)">Refresh</button>
       </div>
     </div>
@@ -71,6 +71,7 @@
     <!-- Display All Cards -->
     <div class="cards-section">
       <div id="cards"></div>
+      <div id="paginationControls" class="pagination-controls"></div>
     </div>
   </div>
 
