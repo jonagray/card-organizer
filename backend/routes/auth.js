@@ -6,6 +6,25 @@ const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
+// Helper function to check if email is whitelisted
+function isEmailWhitelisted(email) {
+  // Get allowed emails from environment variable
+  const allowedEmails = process.env.ALLOWED_EMAILS || '';
+
+  // If no whitelist is set, allow all (for development/testing)
+  // Remove this check if you want to require a whitelist
+  if (!allowedEmails) {
+    console.warn('WARNING: No ALLOWED_EMAILS whitelist configured. All emails are allowed.');
+    return true;
+  }
+
+  // Split by comma and trim whitespace
+  const whitelist = allowedEmails.split(',').map(e => e.trim().toLowerCase());
+
+  // Check if the email is in the whitelist
+  return whitelist.includes(email.toLowerCase());
+}
+
 // Rate limiter for auth endpoints
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
@@ -27,6 +46,13 @@ router.post('/register', authLimiter, async (req, res) => {
 
     if (password.length < 6) {
       return res.status(400).json({ error: 'Password must be at least 6 characters long' });
+    }
+
+    // Check if email is whitelisted
+    if (!isEmailWhitelisted(email)) {
+      return res.status(403).json({
+        error: 'Registration is currently restricted. Your email address is not authorized to create an account.'
+      });
     }
 
     // Check if user already exists
