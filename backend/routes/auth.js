@@ -11,11 +11,10 @@ function isEmailWhitelisted(email) {
   // Get allowed emails from environment variable
   const allowedEmails = process.env.ALLOWED_EMAILS || '';
 
-  // If no whitelist is set, allow all (for development/testing)
-  // Remove this check if you want to require a whitelist
+  // If no whitelist is set, block all registrations
   if (!allowedEmails) {
-    console.warn('WARNING: No ALLOWED_EMAILS whitelist configured. All emails are allowed.');
-    return true;
+    console.error('ERROR: No ALLOWED_EMAILS whitelist configured. All registrations blocked.');
+    return false;
   }
 
   // Split by comma and trim whitespace
