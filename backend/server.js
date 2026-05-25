@@ -225,10 +225,21 @@ app.get("/autocomplete/:field", authMiddleware, async (req, res) => {
 });
 
 // API to upload card data (protected)
-app.post("/upload", authMiddleware, uploadLimiter, upload.array("pages", 5), async (req, res) => {
+app.post("/upload", authMiddleware, uploadLimiter, (req, res, next) => {
+  upload.array("pages", 5)(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({ message: "File upload failed", error: err.message });
+    }
+    next();
+  });
+}, async (req, res) => {
   let { title, from, to, occasion, flipOrientation, note } = req.body;
   // S3 files have 'location' property with full URL
-  const pages = req.files.map(file => file.location);
+  const pages = (req.files || []).map(file => file.location);
+
+  if (pages.length === 0) {
+    return res.status(400).json({ message: "At least one image is required" });
+  }
 
   // Convert from/to to arrays if they're strings (handles JSON or comma-separated values)
   if (typeof from === 'string') {

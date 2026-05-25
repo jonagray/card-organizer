@@ -300,6 +300,13 @@ function showDropdown(inputElement, dropdown, suggestions, field) {
   });
 
   dropdown.style.display = 'block';
+
+  // On mobile, scroll so the dropdown isn't hidden behind the keyboard
+  if ('ontouchstart' in window) {
+    setTimeout(() => {
+      dropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
+  }
 }
 
 // Update selected item in dropdown
@@ -723,6 +730,9 @@ async function addCard() {
     }
 
     const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || result.error || 'Error adding card');
+    }
     alert('Card added successfully!');
 
     // Clear form
@@ -743,7 +753,7 @@ async function addCard() {
     getCards();
   } catch (error) {
     console.error('Error adding card:', error);
-    alert('Error adding card. Please try again.');
+    alert(error.message || 'Error adding card. Please try again.');
   }
 }
 

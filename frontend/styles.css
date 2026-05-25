@@ -861,6 +861,8 @@ textarea {
   .modal-content {
     width: 95%;
     padding: 30px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .auth-modal {
@@ -954,6 +956,8 @@ textarea {
     width: 98%;
     padding: 25px 15px;
     border-radius: 15px;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 
   .close {
