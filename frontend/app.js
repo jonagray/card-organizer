@@ -300,6 +300,13 @@ function showDropdown(inputElement, dropdown, suggestions, field) {
   });
 
   dropdown.style.display = 'block';
+
+  // On mobile, scroll so the dropdown isn't hidden behind the keyboard
+  if ('ontouchstart' in window) {
+    setTimeout(() => {
+      dropdown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 300);
+  }
 }
 
 // Update selected item in dropdown
