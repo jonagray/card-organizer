@@ -703,6 +703,11 @@ async function addCard() {
     return;
   }
 
+  if (pagesInput.files.length > 20) {
+    alert("You can upload a maximum of 20 images per card.");
+    return;
+  }
+
   const formData = new FormData();
   formData.append("title", title);
   formData.append("from", JSON.stringify(fromTags));
