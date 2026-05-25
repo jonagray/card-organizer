@@ -723,6 +723,9 @@ async function addCard() {
     }
 
     const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || result.error || 'Error adding card');
+    }
     alert('Card added successfully!');
 
     // Clear form
@@ -743,7 +746,7 @@ async function addCard() {
     getCards();
   } catch (error) {
     console.error('Error adding card:', error);
-    alert('Error adding card. Please try again.');
+    alert(error.message || 'Error adding card. Please try again.');
   }
 }
 
