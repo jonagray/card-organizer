@@ -226,7 +226,7 @@ app.get("/autocomplete/:field", authMiddleware, async (req, res) => {
 
 // API to upload card data (protected)
 app.post("/upload", authMiddleware, uploadLimiter, (req, res, next) => {
-  upload.array("pages", 5)(req, res, (err) => {
+  upload.array("pages", 20)(req, res, (err) => {
     if (err) {
       return res.status(400).json({ message: "File upload failed", error: err.message });
     }
